@@ -1,0 +1,13 @@
+{
+    "development": {
+      "username": "amanstore",
+      "password": "amanstore",
+      "database": "amanstore",
+      "host": "192.168.10.207",
+      "dialect": "oracle",
+      "dialectOptions": {
+        "connectString": "192.168.10.207/orcl"
+      }
+    }
+  }
+  
