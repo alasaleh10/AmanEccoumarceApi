@@ -1,82 +1,134 @@
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
+const moment = require('moment-timezone');
 const expressHandler = require('express-async-handler');
+const jwt = require('jsonwebtoken')
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const User=require('../Models/UserModel');
-const seandFailreResponse = require('../../../utils/ResponseHepler/SendFailureResponse');
 
+const generatedCode = require('../../../utils/generadt_code');
+const sendEmail = require('../../../helpers/sendEmail');
 
-
+const ApiError = require('../../../utils/ApiError');
+const myTime = require('../../../helpers/myTime');
+const add5MinTime=moment().tz('Asia/Aden').add(5, 'minutes').format('yyyy-MM-DD HH:mm:ss');
 class AuthController
 {
 
-
-    signUp=expressHandler(async(req,res,next)=>
+  cheekToken=expressHandler(async(req,res,next)=>
     {
-       const {firstName,lastName,email,phone,password}=req.body;
-        const user = await User.create({firstName,lastName,email,phone,password});
-     const data={
-        id:user.id,
-        email:user.email
+      let token;
+      if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+        {
+          token=req.headers.authorization.split(' ')[1];
+        }
+
+      if(!token)
+        {
+          return next(new ApiError(401,'خطا في تسجيل الدخول, يرجى تسجيل الدخول مرة أخرى'));
+        }
+
+      const decoded=jwt.verify(token,process.env.JWT_SECRET_KEY);
+
+      const user=await User.findOne({where:{id:decoded.id}});
+      if(!user)
+        {
+          return next(new ApiError(401,'لايوجد حساب لديك قم بتسجيل حساب'));
+        }
+        if (user.passwordUpdatedAt) {
+          const issuedAt = moment.unix(decoded.iat).format('YYYY-MM-DD HH:mm:ss');
         
-     };
-        return res.status(201).json({
-            success:true,
-            message:'تم تسجيل المستخدم بنجاح',
-            data      
-        }); 
+       
+          const issuedAtMoment = moment(issuedAt, 'YYYY-MM-DD HH:mm:ss');
+          const passwordUpdatedAtMoment = moment(user.passwordUpdatedAt, 'YYYY-MM-DD HH:mm:ss');
+        
+         
+          if (issuedAtMoment.isBefore(passwordUpdatedAtMoment)) {
+            return next(new ApiError(401, 'انتهت صلاحية كلمة المرور الخاصة بك'));
+          }
+        }
+        
+
+      req.user=user;
+      next();
+
+
+
+
+    });
+
+    cheekisAdmin=expressHandler(async(req,res,next)=>{
+
+      if(!req.user.isAdmin==true)
+        {
+          return  res.status(401).json({success:false,message:"غير مسموح لك بالدخول"})
+        }
+        next();
+
+
     })
 
-    virifyCode=expressHandler(async(req,res,next)=>
-        {
-            const {email,virifyCode}=req.body;
 
-            const hashedResetCode = crypto
-    .createHash('sha256')
-    .update(virifyCode)
-    .digest('hex');
-            const user=await User.findOne({where:{email:email}});
+forgetPassword=expressHandler(async(req,res)=>{
+    const code=generatedCode();
+    console.log(code);
+    
+    const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+    const {email}=req.body;
+ await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
 
+   return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح"});
+
+});
+
+sendCode=expressHandler(async(req,res)=>
+   {
+      let code = Math.floor(10000 + Math.random() * 90000).toString();
+      const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
             
-            if(user.virifyCode===hashedResetCode)
-                {
-                    if(user.expireCodeDate>Date.now())
-                        {
-                            let code = Math.floor(10000 + Math.random() * 90000).toString();
-                            const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
-                         await User.update({virifyCode:hashedCode,isApproved:true},{where:{email:email}});
-                             const token=jwt.sign({id:user.id},process.env.JWT_SECRET_KEY);
-                             if (user.image) {
-                                user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
-                            }
-                            user.password=undefined;
-                            user.virifyCode=undefined;
-                            user.expireCodeDate=undefined;
+    const {email}=req.body;
 
-                            return res.status(200).json({
-                                success:true,
-                                message:'تم التحقق بنجاح',
-                                user,
-                                token
-                            });
-                        }
-                        else
-                        {
-                            return seandFailreResponse(res,400,'انتهت صلاحية الكود')
-                        }
-                }
-                else
-                {
-                    return seandFailreResponse(res,400,'كود التحقق غير صحيح')
-                }
-        }
-);
-   
+    const user=await User.findOne({where:{email:email}});          
+    try {
+      console.log(code);
+      
+      //   await sendEmail(
+      //       user.email,
+      //       `
+      //           <div dir="rtl" style="text-align: right;">
+      //               <p>مرحبا ${user.firstName}،</p>
+      //               <p>كود التحقق الخاص بك هو:</p>
+      //               <h2>${code}</h2>
+      //               <p>لا تقم بمشاركته مع أحد.</p>
+      //           </div>
+      //       `,
+      //       "كود التحقق لحسابك في متجر أمان"
+      //   );
+
+        await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
+       return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح"});
+      } catch (error) {
+        throw new ApiErorr(400,'فشل إرسال البريد الإلكتروني');
+        
+     
+    }
 
 
+   });
+
+restPassword=expressHandler(async(req,res)=>{
+    
+
+    const {email,password}=req.body;
+  
+    const hashedPassword=await bcrypt.hash(password,10);
+
+    await User.update({password:hashedPassword,passwordUpdatedAt:myTime},{where:{email:email}});
+
+    return res.status(200).json({success:true,message:"تم تغيير كلمة المرور بنجاح"});
 
 
-
+   });
 
 }
-
 module.exports=AuthController;

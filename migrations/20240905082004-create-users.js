@@ -34,20 +34,20 @@ module.exports = {
         },
         password:
         {
-          type:Sequelize.STRING(400),
+          type:Sequelize.STRING(800),
           allowNull:false
         },
         image:{
-          type:Sequelize.STRING(500),
+          type:Sequelize.STRING(800),
           allowNull:true
         },
         virifyCode:
         {
-          type:Sequelize.STRING(400),
+          type:Sequelize.STRING(800),
           allowNull:false
         },
         expireCodeDate:{
-          type:Sequelize.DATE,
+          type:Sequelize.STRING(1000),
           allowNull:false
         },
         isApproved:
@@ -68,17 +68,17 @@ module.exports = {
           default:0
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: Sequelize.STRING(800),
           allowNull: false,
           
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: Sequelize.STRING(800),
           allowNull: false,
         
         },
         passwordUpdatedAt: {
-          type: Sequelize.DATE,
+          type: Sequelize.STRING(800),
           allowNull: false,
         
         }

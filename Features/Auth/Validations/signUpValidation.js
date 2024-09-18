@@ -5,7 +5,7 @@ const User = require('../Models/UserModel');
 signUpValidation = [
 
 
-    check('firstName').bail().notEmpty().withMessage('الإسم الأول مطلوب')
+    check('firstName').notEmpty().withMessage('الإسم الأول مطلوب')
     .isLength({ min: 3 }).withMessage('يجب الا يقل الإسم الأول عن 3 حروف'),
 
     check('lastName').optional().
@@ -36,6 +36,15 @@ signUpValidation = [
 
     check('password').notEmpty().withMessage('كلمة المرور مطلوبة')
     .isLength({ min: 8 }).withMessage('يجب الا يقل كلمة المرور عن 8 حروف'),
+    check('confirmPassword')
+    .notEmpty()
+    .withMessage('تأكيد كلمة المرور مطلوبة')
+    .custom((value, { req }) => {    
+        if (value !== req.body.password) {
+            throw new Error('كلمة المرور غير متطابقة');
+        }
+        return true; 
+    }),
     validationMiddleware
 
 
