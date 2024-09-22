@@ -51,10 +51,6 @@ class AuthController
 
       req.user=user;
       next();
-
-
-
-
     });
 
     cheekisAdmin=expressHandler(async(req,res,next)=>{
@@ -67,6 +63,45 @@ class AuthController
 
 
     })
+    optinalToken=expressHandler(async(req,res,next)=>{
+      let token;
+      if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
+        {
+          token=req.headers.authorization.split(' ')[1];
+        }
+
+      if(!token)
+        {
+       return   next();
+        }
+        const decoded=jwt.verify(token,process.env.JWT_SECRET_KEY);
+
+      const user=await User.findOne({where:{id:decoded.id}});
+      if(!user)
+        {
+          return next(new ApiError(401,'لايوجد حساب لديك قم بتسجيل حساب'));
+        }
+        if (user.passwordUpdatedAt) {
+          const issuedAt = moment.unix(decoded.iat).format('YYYY-MM-DD HH:mm:ss');
+        
+       
+          const issuedAtMoment = moment(issuedAt, 'YYYY-MM-DD HH:mm:ss');
+          const passwordUpdatedAtMoment = moment(user.passwordUpdatedAt, 'YYYY-MM-DD HH:mm:ss');
+        
+         
+          if (issuedAtMoment.isBefore(passwordUpdatedAtMoment)) {
+            return next(new ApiError(401, 'انتهت صلاحية كلمة المرور الخاصة بك'));
+          }
+        }
+        
+
+      req.user=user;
+      next();
+
+
+
+
+    });
 
 
 forgetPassword=expressHandler(async(req,res)=>{
@@ -130,5 +165,15 @@ restPassword=expressHandler(async(req,res)=>{
 
    });
 
+ editMyAccount=expressHandler(async(req,res)=>{
+    const id=req.user.id;
+    const body=req.body;
+    await User.update(body,{where:{id:id}});
+    return res.status(200).json({status:true,message:"تم تعديل حسابك بنجاح"});
+
+
+
+
+})
 }
 module.exports=AuthController;

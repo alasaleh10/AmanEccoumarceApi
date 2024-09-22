@@ -2,11 +2,11 @@
 const sharp = require('sharp');
 const generatedCode = require('../utils/generadt_code');
 
-resizeImage = async (req, storageFile, quality=95, width = 600, height = 600) => {
+resizedImageOneFromList = async (req, storageFile, quality=95, width = 600, height = 600) => {
 let code=  generatedCode();
   const filename = `${storageFile}-${Date.now()}-${Math.round(Math.random() * 1E9)}${code}.jpeg`;
 
-  await sharp(req.file.buffer)
+  await sharp(req.files.image[0].buffer)
     .resize(width, height)
     .toFormat('jpeg')
     .jpeg({ quality: quality })
@@ -16,4 +16,4 @@ let code=  generatedCode();
 
   return filename;
 };
-module.exports = resizeImage;
+module.exports = resizedImageOneFromList;

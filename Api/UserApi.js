@@ -7,8 +7,11 @@ const upload = multer();
 const signUpValidation = require('../Features/Auth/Validations/signUpValidation');
 const virifyCodeVAildation = require('../Features/Auth/Validations/VirifyCodeValidation');
 const loginValidation = require('../Features/Auth/Validations/loginValidation');
-const { forgetPasswordValidation ,sendCodeValidation
-     ,restPasswordValidation
+const {
+     forgetPasswordValidation ,
+     sendCodeValidation ,
+     restPasswordValidation,
+     editMyAccountValidation
 } = require('../Features/Auth/Validations/forgetPasswordValidation');
 const UserController = require('../Features/Auth/Controller/UserController');
 const userController = new UserController();
@@ -46,13 +49,19 @@ router.put('/restPassword',
      upload.none(),
 restPasswordValidation,
  authController.restPassword
-
-)
+);
 
 
 router.post('/forgetPassword',
-     upload.none(),
-     forgetPasswordValidation,
-authController.forgetPassword);
+forgetPasswordValidation,
+authController.forgetPassword
+);
+
+router.put('/editMyAccount',
+
+     authController.cheekToken,
+     editMyAccountValidation,
+     authController.editMyAccount
+     );
 
 module.exports = router;

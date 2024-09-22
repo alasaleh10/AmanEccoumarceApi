@@ -67,7 +67,7 @@ const checkFileExists = (req, res, next) => {
 
 exports.uploadSingleImage = (fieldName) => [
   multerOptions().single(fieldName),
-  checkFileExists // Ensure the file is uploaded
+  checkFileExists
 ];
 
 exports.uploadMixOfImages = (arrayOfFields) => multerOptions().fields(arrayOfFields);

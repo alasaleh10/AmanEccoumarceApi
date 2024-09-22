@@ -55,8 +55,26 @@ restPasswordValidation=[
     validationMiddleware
 ];
 
+editMyAccountValidation=[
+    check('phone').optional().isMobilePhone().withMessage('رقم الهاتف غير صحيح').custom(async (value,req) => {
+      
+        
+
+        const user=await User.findOne({where:{phone:value}});
+        if(user){
+           
+            return Promise.reject(new Error('رقم الهاتف موجود بالفعل'));
+        }
+    }),
+    check('firstName').optional().isLength({ min: 3 }).withMessage('يجب الا يقل الاسم عن 3 حروف'),
+    check('lastName').optional().isLength({ min: 3 }).withMessage('يجب الا يقل الاسم عن 3 حروف'),
+
+    validationMiddleware
+    
+]
 module.exports={
     forgetPasswordValidation,
     sendCodeValidation,
-    restPasswordValidation
+    restPasswordValidation,
+    editMyAccountValidation
 };

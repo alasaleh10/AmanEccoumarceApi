@@ -3,20 +3,77 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
+  
+    await queryInterface.createTable('products', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      name: {
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      subName: {
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      description: {
+        type: Sequelize.STRING(255),
+        allowNull: false
+      },
+      price: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      image: {
+        type: Sequelize.STRING(1000),
+        allowNull: false
+      },
+      quilty: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+        
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      discount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
+
+      categoriee:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'categories',
+          key: 'id'
+        }
+      },
+      isNew: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+        
+      },
+      createdAt: {
+        type: Sequelize.STRING(500),
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.STRING(500),
+        allowNull: false
+      }
+    })
   },
 
   async down (queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+
+    await queryInterface.dropTable('products');
+   
   }
 };
