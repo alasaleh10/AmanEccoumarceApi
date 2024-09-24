@@ -19,7 +19,6 @@ const AuthController = require('../Features/Auth/Controller/AuthController');
 const authController = new AuthController();
 
 router.post('/signUp',
-    
      upload.none(),
       signUpValidation,
       userController.signUp

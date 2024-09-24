@@ -8,7 +8,7 @@ signUpValidation = [
     check('firstName').notEmpty().withMessage('الإسم الأول مطلوب')
     .isLength({ min: 3 }).withMessage('يجب الا يقل الإسم الأول عن 3 حروف'),
 
-    check('lastName').optional().
+    check('lastName').
     isLength({ min: 3 }).withMessage('يجب الا يقل الإسم الأخير عن 3 حروف'),
 
     check('email').notEmpty().withMessage('البريد الألكتروني مطلوب')

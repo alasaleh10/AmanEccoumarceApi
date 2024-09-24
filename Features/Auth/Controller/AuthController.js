@@ -5,10 +5,9 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const User=require('../Models/UserModel');
-
 const generatedCode = require('../../../utils/generadt_code');
 const sendEmail = require('../../../helpers/sendEmail');
-
+const {welcomAgainMessage} = require('../../../helpers/emailMessages');
 const ApiError = require('../../../utils/ApiError');
 const myTime = require('../../../helpers/myTime');
 const add5MinTime=moment().tz('Asia/Aden').add(5, 'minutes').format('yyyy-MM-DD HH:mm:ss');
@@ -122,28 +121,22 @@ sendCode=expressHandler(async(req,res)=>
       const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
             
     const {email}=req.body;
+  
+    
 
     const user=await User.findOne({where:{email:email}});          
-    try {
-      console.log(code);
-      
-      //   await sendEmail(
-      //       user.email,
-      //       `
-      //           <div dir="rtl" style="text-align: right;">
-      //               <p>مرحبا ${user.firstName}،</p>
-      //               <p>كود التحقق الخاص بك هو:</p>
-      //               <h2>${code}</h2>
-      //               <p>لا تقم بمشاركته مع أحد.</p>
-      //           </div>
-      //       `,
-      //       "كود التحقق لحسابك في متجر أمان"
-      //   );
+    try {  
+     await sendEmail(
+            user.email,
+            welcomAgainMessage(code, user.firstName)
+           ,
+            "كود التحقق لحسابك في متجر أمان"
+        );
 
         await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
        return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح"});
       } catch (error) {
-        throw new ApiErorr(400,'فشل إرسال البريد الإلكتروني');
+        throw new ApiError(400,'فشل إرسال البريد الإلكتروني');
         
      
     }

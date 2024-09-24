@@ -1,8 +1,8 @@
 'use strict';
-
+const moment = require('moment-timezone');
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const now = new Date().toString(); // استخدم JavaScript Date للحصول على التاريخ الحالي
+    const now = moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss');
     await queryInterface.bulkInsert('categories', [
       {
         name: 'أجهزة الكترونية',

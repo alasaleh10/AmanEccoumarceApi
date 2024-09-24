@@ -1,5 +1,4 @@
 const moment = require('moment-timezone');
-const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { DataTypes } = require('sequelize');
 
@@ -7,7 +6,7 @@ const { sequelize } = require('../../../Config/database');
 const sendEmail = require('../../../helpers/sendEmail');
 const hashedCode = require('../../../helpers/hashedCode');
 const ApiErorr = require('../../../utils/ApiError');
-
+const {welcomAmanMessage} = require('../../../helpers/emailMessages');
 const User = sequelize.define('users', {
     id: {
         type: DataTypes.INTEGER,
@@ -33,7 +32,7 @@ const User = sequelize.define('users', {
         type: DataTypes.STRING
     },
     expireCodeDate: {
-        type: DataTypes.STRING // ستبقى كـ STRING
+        type: DataTypes.STRING 
     },
     credit: {
         type: DataTypes.INTEGER,
@@ -65,7 +64,12 @@ const User = sequelize.define('users', {
         type: DataTypes.STRING 
     }
 
-},  
+}, 
+
+
+
+
+
 {
     timestamps:false,
     hooks: {
@@ -73,25 +77,19 @@ const User = sequelize.define('users', {
             const now = moment().tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss');
 
             let code = Math.floor(10000 + Math.random() * 90000).toString();
-            console.log(code);
+          
 
-            // try {
-            //     await sendEmail(
-            //         user.email,
-            //         `
-            //         <div dir="rtl" style="text-align: right;">
-            //             <p>مرحبا ${user.firstName}،</p>
-            //             <p>يشرفنا انضمامك إلى متجر أمان.</p>
-            //             <p>كود التحقق الخاص بك هو:</p>
-            //             <h2>${code}</h2>
-            //             <p>لا تقم بمشاركته مع أحد.</p>
-            //         </div>
-            //         `,
-            //         "كود التحقق لحسابك في متجر أمان"
-            //     );
-            // } catch (error) {
-            //     throw new ApiErorr(400, 'فشل إرسال البريد الإلكتروني');
-            // }
+            try {
+                await sendEmail(
+                    user.email,
+                    welcomAmanMessage(code, user.firstName),
+                    "كود التحقق لحسابك في متجر أمان"
+                );
+            } catch (error) {
+              
+
+                throw new ApiErorr(400, 'فشل إرسال البريد الإلكتروني');
+            }
 
            
             user.virifyCode = hashedCode(code);

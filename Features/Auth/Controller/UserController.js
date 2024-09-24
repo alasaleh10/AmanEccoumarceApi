@@ -48,7 +48,7 @@ class UserController
     .update(virifyCode)
     .digest('hex');
             const user=await User.findOne({where:{email:email}});
-            const userdate=new Date(user.passwordUpdatedAt);
+           
 
             
             if(user.virifyCode===hashedResetCode)
@@ -58,8 +58,11 @@ class UserController
                             let code = Math.floor(10000 + Math.random() * 90000).toString();
                             const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
 
-                       await User.update({virifyCode:hashedCode,isApproved:true}
+                   const user2=    await User.update({virifyCode:hashedCode,isApproved:true,passwordUpdatedAt:date}
+
                        ,{where:{email:email}});
+
+                       const userdate=new Date(user2.passwordUpdatedAt);
                              const token=jwt.sign({id:user.id,
 
                                 iat:Math.floor(userdate.getTime() / 1000)

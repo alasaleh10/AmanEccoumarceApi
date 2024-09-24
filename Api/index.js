@@ -4,6 +4,8 @@ const locationApi = require('./LocationApi');
 const categorieeApi = require('./CategorieeApi');
 const productApi = require('./ProductApi');
 const favoriteApi = require('./FavoriteApi');
+const homeApi = require('./HomeApi');
+const problemApi = require('./ProblemApi');
 
 const mountRoutes=(app)=>
     {
@@ -13,6 +15,8 @@ app.use('/api/locations', locationApi);
 app.use('/api/categoriees', categorieeApi);
 app.use('/api/products', productApi);
 app.use('/api/favorites', favoriteApi);
+app.use('/api/home', homeApi);
+app.use('/api/problems', problemApi);
     }
 
 module.exports=mountRoutes;
