@@ -4,12 +4,12 @@ const generatedCode = require('../utils/generadt_code');
 
 resizeImage = async (req, storageFile, quality=95, width = 600, height = 600) => {
 let code=  generatedCode();
-  const filename = `${storageFile}-${Date.now()}-${Math.round(Math.random() * 1E9)}${code}.jpeg`;
+  const filename = `${storageFile}-${Date.now()}-${Math.round(Math.random() * 1E9)}${code}.png`;
 
   await sharp(req.file.buffer)
     .resize(width, height)
-    .toFormat('jpeg')
-    .jpeg({ quality: quality })
+    .toFormat('png')
+    .png({ quality: quality })
     .toFile(`storage/${storageFile}/${filename}`);
    
     

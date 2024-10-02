@@ -17,9 +17,10 @@ const UserController = require('../Features/Auth/Controller/UserController');
 const userController = new UserController();
 const AuthController = require('../Features/Auth/Controller/AuthController');
 const authController = new AuthController();
+const {uploadSingleImage} = require('../Middleware/UploadImageMiddelware');
 
 router.post('/signUp',
-     upload.none(),
+   
       signUpValidation,
       userController.signUp
 )  ;
@@ -62,5 +63,16 @@ router.put('/editMyAccount',
      editMyAccountValidation,
      authController.editMyAccount
      );
+router.put('/editImage',
+// (req,res,next)=>{
+//      console.log(req);
+//      next();
+     
+// },
+     authController.cheekToken,
+     uploadSingleImage('image'),
+     authController.editAccountImage
 
+
+);
 module.exports = router;

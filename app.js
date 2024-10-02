@@ -45,14 +45,14 @@ app.use(globalError);
 
 
 
-// const host='192.168.10.164'
+const host='192.168.10.164'
 
 // Run Server
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT,host, () => {
 
     console.log(`server started ${PORT}`);
-    console.log(`http://localhost:${PORT}`);
+    console.log(`http://${host}:${PORT}`);
 
 });
 

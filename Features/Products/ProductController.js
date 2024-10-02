@@ -1,14 +1,15 @@
 const expressHandler = require('express-async-handler');
+const {Sequelize} = require('sequelize');
 const sendFailure = require('../../utils/ResponseHepler/SendFailureResponse');
 const resizedImageOneFromList = require('../../helpers/resizedImageOneFromList');
 const resizedImages = require('../../helpers/ResizedMulterImages');
 const Product = require('./ProductModel');
 const productsImages = require('./productImagesModel');
 const Favorite = require('../Favorite/FavoriteModel');
+
 class ProcuctController{
 
     addProduct=expressHandler(async(req,res,next)=>{
-   
 
     const data = req.body;
 
@@ -26,6 +27,7 @@ product.image=`${process.env.BASE_URL}/storage/products/${mainImageFilename}`
 let productImages = [];
 
 
+
 if (req.files.imag) {
   const images = await resizedImages(req.files.imag, 'products');
   
@@ -35,7 +37,7 @@ if (req.files.imag) {
   }
 }
 
-// الاستجابة النهائية
+
 res.status(201).json({
   status: true,
   message: "تم اضافة المنتج بنجاح",
@@ -130,7 +132,78 @@ res.status(201).json({
   });
   
   res.status(200).json({ status: true, products: productss });
-  })
+  });
+
+   getSpicificProduct = async (req, res) => {
+   
+    
+      const { id } = req.params;
+      const userId = req.user ? req.user.id : null;
+     
+      const product = await Product.findOne({
+        where: { id },
+        include: [
+          {
+            model: productsImages,
+            as: 'images' }
+        ]
+      });
+       
+      product.dataValues.priceAfterDiscount = product.price - ((product.discount / 100) * product.price);
+
+      product.dataValues.isFavorite = userId
+      ? !!(await Favorite.findOne({ where: { user: userId, product: id } }))
+      : false;
+  product.image=`${process.env.BASE_URL}/storage/products/${product.image}`;
+
+  product.images=product.images.map(image=>{
+    delete image.dataValues.productId;
+    delete image.dataValues.id;
+
+    image.imag=`${process.env.BASE_URL}/storage/products/${image.imag}`;
+    return image});
+
+
+  
+  
+    const similarProducts = await Product.findAll({
+      where: {
+        categoriee: product.categoriee,
+        id: { [Sequelize.Op.ne]: product.id }
+      },
+      limit: 5
+    });
+
+
+    const updatedSimilarProducts = await Promise.all(
+      similarProducts.map(async similarProduct => {
+        similarProduct.dataValues.image = `${process.env.BASE_URL}/storage/products/${similarProduct.dataValues.image}`;
+        similarProduct.dataValues.priceAfterDiscount = similarProduct.price - ((similarProduct.discount / 100) * similarProduct.price);
+        delete similarProduct.dataValues.createdAt;
+        delete similarProduct.dataValues.updatedAt;
+        delete similarProduct.dataValues.isActive;
+        delete similarProduct.dataValues.isNew;
+        
+        delete similarProduct.dataValues.categoriee;
+        if (userId) {
+          const favorite = await Favorite.findOne({ where: { user: userId, product: similarProduct.id } });
+          similarProduct.dataValues.isFavorite = !!favorite;
+        } else {
+          similarProduct.dataValues.isFavorite = false;
+        }
+
+        return similarProduct;
+      })
+    );
+    res.status(200).json({
+      status: true,
+      product,
+      similarProducts: updatedSimilarProducts
+    });
+   
+  };
+  
+
 
 
 }

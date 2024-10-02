@@ -1,64 +1,72 @@
 const moment = require('moment-timezone');
 const { DataTypes } = require('sequelize');
-
 const { sequelize } = require('../../Config/database');
-const Product=sequelize.define('products',{
-    id:{
-        type:DataTypes.INTEGER,
-        primaryKey:true,
-        autoIncrement:true
+const ProductImage = require('./productImagesModel');
+
+const Product = sequelize.define('products', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
     },
-    name:{
-        type:DataTypes.STRING   
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
-    subName:{
-        type:DataTypes.STRING,
-        
+    subName: {
+        type: DataTypes.STRING,
     },
-    description:{
-        type:DataTypes.STRING
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
-    price:{
-        type:DataTypes.INTEGER
+    price: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
-    image:{
-        type:DataTypes.STRING
+    image: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
-    quilty:{
-        type:DataTypes.INTEGER
-    },  
-    isActive:{
-        type:DataTypes.BOOLEAN ,
-        defaultValue:true 
+    quilty: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
-    discount:{
-        type:DataTypes.INTEGER,
-        defaultValue:0
+    isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     },
-    isNew:{
-        type:DataTypes.BOOLEAN,
-        defaultValue:true
+    discount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     },
-    categoriee:{
-        type:DataTypes.INTEGER
+    isNew: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
     },
-    createdAt:{
-        type:DataTypes.STRING,
-        defaultValue:moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss')
+    categoriee: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
-    updatedAt:{
-        type:DataTypes.STRING,
-        defaultValue:moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss')
+    createdAt: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: moment().tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
+    },
+    updatedAt: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: moment().tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
     }
-},{
-    timestamps:false,
-
-    beforeUpdate: (product) => {
-        const now = moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss');
-        product.updatedAt = now;
+}, {
+    timestamps: false,
+    hooks: {
+        beforeUpdate: (product) => {
+            const now = moment().tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss');
+            product.updatedAt = now;
+        }
     }
-    
+});
 
-
-})  
-module.exports = Product
+Product.hasMany(ProductImage, { foreignKey: 'productId', as: 'images' });
+module.exports = Product;

@@ -7,9 +7,9 @@ class LocationController
         
         const data=req.body;
        
-        const location=await Location.create({...data,user:req.user.id});
+     await Location.create({...data,user:req.user.id});
 
-        res.status(201).json({status:true,message:"تم اضافة الموقع بنجاح",location:location});
+        res.status(201).json({status:true,message:"تم اضافة الموقع بنجاح"});
 
 
     });
@@ -23,10 +23,7 @@ class LocationController
             order: [['isMain', 'DESC'], ['id', 'ASC']] // ترتيب حسب isMain ثم id
           });
           
-        if(location.length==0) 
-            {
-                return sendFailure(res,400,'لايوجد مواقع');
-            }
+       
         res.status(200).json({status:true,location});
       
 
@@ -57,5 +54,22 @@ class LocationController
 
 
     });
+
+    changeMainLocation=expressHandler(async(req,res)=>{
+
+        const id=req.params.id;
+        const oldLocation=await Location.findOne({where:{id:id,user:req.user.id}});
+        if(oldLocation)
+            {
+            await Location.update({isMain:false},{where:{user:req.user.id}});
+            }
+
+          await Location.update({isMain:true},{where:{id:id,user:req.user.id}});
+          res.status(200).json({status:true,message:"تم تغيير الموقع للرئيسي بنجاح"});  
+           
+
+
+    })
+
 }
 module.exports=LocationController;

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const locationValidation = require('../Features/locations/LocationValidation');
+const {locationValidation,
+    setMainLocation
+
+} = require('../Features/locations/LocationValidation');
 const AuthController = require('../Features/Auth/Controller/AuthController');
 const authController = new AuthController();
 const LocationController = require('../Features/locations/LocationController');
@@ -24,6 +27,12 @@ router.get('/spicific/:id',
 router.delete('/delete/:id',
     authController.cheekToken,  
     locationController.deleteLocation
+),
+
+router.put('/changeMainLocation/:id?',
+    authController.cheekToken,
+    setMainLocation,
+    locationController.changeMainLocation   
 )
 
 

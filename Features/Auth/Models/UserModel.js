@@ -72,7 +72,7 @@ const User = sequelize.define('users', {
 
 {
     timestamps:false,
-    hooks: {
+  
         beforeCreate: async (user) => {
             const now = moment().tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss');
 
@@ -99,8 +99,11 @@ const User = sequelize.define('users', {
             user.createdAt = now;
             user.updatedAt = now;
             user.passwordUpdatedAt = now;
+        },
+        beforeUpdate: (user) => {
+            const now = moment().tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss');
+            user.updatedAt = now;
         }
-    }
 });
 
 module.exports = User;

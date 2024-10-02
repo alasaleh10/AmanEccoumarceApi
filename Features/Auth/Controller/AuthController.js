@@ -1,4 +1,6 @@
-// const jwt = require('jsonwebtoken');
+
+const fs = require('fs');
+const path = require('path');
 const moment = require('moment-timezone');
 const expressHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken')
@@ -10,6 +12,7 @@ const sendEmail = require('../../../helpers/sendEmail');
 const {welcomAgainMessage} = require('../../../helpers/emailMessages');
 const ApiError = require('../../../utils/ApiError');
 const myTime = require('../../../helpers/myTime');
+const resizedImage = require('../../../helpers/resizedImage');
 const add5MinTime=moment().tz('Asia/Aden').add(5, 'minutes').format('yyyy-MM-DD HH:mm:ss');
 class AuthController
 {
@@ -168,5 +171,22 @@ restPassword=expressHandler(async(req,res)=>{
 
 
 })
+editAccountImage=expressHandler(async(req,res)=>{
+
+    const id=req.user.id;
+    const user=await User.findOne({where:{id:id}});
+  const filename=await resizedImage(req,'users');
+    if(user.image!='defualtUserImage.jpeg') 
+      {
+       fs.unlinkSync(`storage/users/${user.image}`);
+
+      }
+    await User.update({image:filename},{where:{id:id}});
+    return res.status(200).json({status:true,message:"تم تعديل الصورة الشخصية بنجاح"});
+
+      
+
+});
+
 }
 module.exports=AuthController;

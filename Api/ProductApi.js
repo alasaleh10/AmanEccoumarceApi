@@ -8,10 +8,9 @@ const addProductValidation = require('../Features/Products/validations/AddProduc
 const ProcuctController = require('../Features/Products/ProductController');
 const procuctController = new ProcuctController();
 const {uploadMixOfImages} = require('../Middleware/UploadImageMiddelware');
-const productCategorieeValidation = require('../Features/Products/validations/productsCategorieeValidation');
-
-
+const productDetilsValidation = require('../Features/Products/validations/ProductDetilsValidation');
 router.post('/addProduct',
+ 
   
     authController.cheekToken,
     authController.cheekisAdmin,
@@ -20,7 +19,8 @@ router.post('/addProduct',
         { name: 'imag', maxCount: 10 }
       ]),
     addProductValidation,
-    procuctController.addProduct),
+    procuctController.addProduct
+  ),
 
 
 router.get('/getProductsByCategoriees/:id',
@@ -31,21 +31,10 @@ router.get('/getProductsByCategoriees/:id',
 router.get('/newAmanProducts',
   authController.optinalToken,
     procuctController.getNewAmanProducts
-)   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+);
+router.get('/getSpicificProduct/:id?',
+  productDetilsValidation,
+  authController.optinalToken,
+    procuctController.getSpicificProduct
+);
 module.exports = router;
