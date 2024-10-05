@@ -13,10 +13,10 @@ class CartController
   getMyCart = expressHandler(async (req, res, next) => {
     const id = req.user.id;
     let totalPrice = 0;
-    let productPriceTotal=0;
+  
 
     const cart = await Cart.findAll({
-        where: { user: id },
+        where: { user: id,status:0 },
         include: [
             {
                 model: Product,
@@ -24,12 +24,16 @@ class CartController
                 attributes: ['id', 'name', 'subName', 'price', 'image', 'quilty', 'discount'],
                 where: {
                     isActive: true,
-                    quilty: { [Op.gt]: 0 },
+                    quilty: { [Op.gte]: 0 },
                 },
                 order: [['id', 'ASC']],
             },
         ],
     });
+    if(cart.length==0)
+      {
+        return res.status(400).json({ status: false, message: "السلة فارغة" });
+      }
 
     const cartItems = await Promise.all(cart.map(async item => {
         const favorite = await Favorite.findOne({
