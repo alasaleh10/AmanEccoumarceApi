@@ -178,6 +178,7 @@ if(order.coupon)
       delete order.dataValues.coupon;
       delete order.dataValues.totalCart;
       delete order.dataValues.deliveryPrice;
+      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
 
       
 
@@ -215,6 +216,7 @@ if(order.coupon)
       delete order.dataValues.coupon;
       delete order.dataValues.totalCart;
       delete order.dataValues.deliveryPrice;
+      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
 
       
 

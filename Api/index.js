@@ -9,6 +9,7 @@ const problemApi = require('./ProblemApi');
 const CartApi = require('./CartApi');
 const CouponApi = require('./CouponApi');
 const OrderApi = require('./OrderApi');
+const RatingApi = require('./RatingApi');
 
 const mountRoutes=(app)=>
     {
@@ -23,6 +24,7 @@ app.use('/api/problems', problemApi);
 app.use('/api/carts', CartApi);
 app.use('/api/coupons', CouponApi);
 app.use('/api/orders', OrderApi);
+app.use('/api/ratings', RatingApi);
     }
 
 module.exports=mountRoutes;
