@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '')));
 if (process.env.type === 'dev') {
     app.use(morgan('dev'));
-}
+}  
 
 mountRoutes(app);
 
@@ -35,13 +35,6 @@ app.all('*', (req, res) => {
 
 
 app.use(globalError);
-
-
-
-
-
-
-
 
 
 

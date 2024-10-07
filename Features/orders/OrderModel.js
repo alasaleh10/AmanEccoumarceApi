@@ -1,7 +1,7 @@
 const moment = require('moment-timezone');
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../../Config/database');
-const OrderItem = require('./OrderItemsModel');
+const OrderItem = require('../orders/OrderItemsModel');
 const Order=sequelize.define('orders',{
     id:{
         type:DataTypes.INTEGER,
@@ -49,6 +49,14 @@ const Order=sequelize.define('orders',{
         type:DataTypes.INTEGER,
         allowNull:false
     },
+    deliveryDate:{
+        type:DataTypes.DATE,
+        allowNull:true
+    },
+    recivedDate:{
+        type:DataTypes.DATE,
+        allowNull:true
+    },
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE
@@ -62,18 +70,19 @@ const Order=sequelize.define('orders',{
     timestamps: true,
     beforeCreate: async (order) => 
         {
-            // order.createdAt = moment().tz('Asia/Aden').format();
-            // order.updatedAt = moment().tz('Asia/Aden').format();
+            order.createdAt = moment().tz('Asia/Aden').format();
+            order.updatedAt = moment().tz('Asia/Aden').format();
             
         },
         befupdate: async (order) => 
         {
-            // order.updatedAt = moment().tz('Asia/Aden').format();
+            order.updatedAt = moment().tz('Asia/Aden').format();
             
         }
     
 }
 
 )
-Order.hasMany(OrderItem, { foreignKey: 'order', as: 'items' });
+Order.hasMany(OrderItem, { foreignKey: 'order', as: 'orderItems' });
+
 module.exports = Order

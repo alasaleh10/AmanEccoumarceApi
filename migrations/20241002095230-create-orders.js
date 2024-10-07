@@ -57,6 +57,10 @@ module.exports = {
       allowNull: true
       
     },
+    recivedDate: {
+       type: Sequelize.DATE,
+       allowNull: true
+    },
     location:{
       type: Sequelize.INTEGER,
       allowNull: true

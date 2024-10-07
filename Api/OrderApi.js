@@ -4,7 +4,9 @@ const AuthControoler = require('../Features/Auth/Controller/AuthController');
 const authController = new AuthControoler();
 const OrderController = require('../Features/orders/OrderController');
 const orderController = new OrderController();
-const {addOrderValidation} = require('../Features/orders/OrderValidation');
+const {addOrderValidation,
+    orderDetilsValidation
+                          } = require('../Features/orders/OrderValidation');
 
 
 
@@ -13,6 +15,19 @@ router.post('/createOrder',
     authController.cheekToken,
     addOrderValidation,
     orderController.addOrder
+),
+router.get('/myPreviousOrders',
+    authController.cheekToken,
+    orderController.getMyPreviousOrders
+)
+router.get('/myCurrentOrders',
+    authController.cheekToken,
+    orderController.getCurrentOrder
+)
+router.get('/orderDetails/:id?',
+    authController.cheekToken,
+    orderDetilsValidation,
+    orderController.getMyOrderDetils
 )
 
 

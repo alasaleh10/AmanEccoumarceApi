@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
 const moment = require('moment-timezone');
+const { Op } = require('sequelize');
 const expressHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const User=require('../Models/UserModel');
 const seandFailreResponse = require('../../../utils/ResponseHepler/SendFailureResponse');
 const date = require('../../../helpers/myTime');
-
+const Order = require('../../orders/OrderModel');
 
 const now = moment().tz('Asia/Aden');
 
@@ -158,9 +159,13 @@ class UserController
             user.virifyCode=undefined;
             user.expireCodeDate=undefined;
             user.passwordUpdatedAt=undefined;
+            const order=await Order.count({where:{user:user.id, status: {
+                [Op.notIn]: [4, 5, 6]  
+            }}})
             return res.status(200).json({
                 success:true,
-                user
+                user,
+                order
             })
         })
 
