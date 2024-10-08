@@ -3,6 +3,9 @@ const router = express.Router();
 const {addCartValidation,
     deleteCartValidatio,
     cheekWalletValidation,
+    editCartValidation,
+    cheekCartProductQuantity
+
     
 } = require('../Features/cart/CartValidation');
 const CartController = require('../Features/cart/CartController');
@@ -41,6 +44,21 @@ router.post('/cheekMyWallet',
 router.get('/cheekCartItemsQuantity',
     authController.cheekToken,
     cartController.cheekCartItemsQuantity
+)
+router.post('/editCart',
+    authController.cheekToken,
+    editCartValidation,
+   cartController.editCart
+)
+
+router.get('/cheekCartProduct/:id?',
+    authController.cheekToken,
+    cheekCartProductQuantity,
+    cartController.cheekCartProduct
+)
+router.delete('/deleteProductFromCart/:id?',
+    authController.cheekToken,
+    cartController.deleteProductFromCart
 )
 
 

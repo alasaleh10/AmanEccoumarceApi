@@ -5,7 +5,6 @@ const Product = require('../Products/ProductModel');
 const Favorite = require('../Favorite/FavoriteModel');
 const Location = require('../locations/LocationModel');
 const User = require('../Auth/Models/UserModel');
-const ApiErro = require('../../utils/ApiError');
 const calculateDistance = require('../../helpers/distance');
 
 class CartController
@@ -98,11 +97,57 @@ class CartController
 
     editCart=expressHandler(async(req,res,next)=>{
 
-        const id=req.user.id;
-        const product=req.body.product;
+      const id=req.user.id;
+      const productId=req.body.product;
+      const quantity = req.body.quantity ;
+      const product=await Product.findOne({where:{id:productId}})
+      const oldCart=await Cart.findOne({where:{user:id,product:productId}});
+      if(oldCart)
+        {
+
+          if(quantity==0)
+            {
+              await Cart.destroy({where:{user:id,product:productId}})
+              return  res.status(200).json({status:true,message:"تم الحذف بنجاح"})
+            }
 
 
-    })
+          if(product.quilty<quantity)
+            {
+              return res.status(400).json({ status: false, message: "الكمية المطلوبة غير متوفرة" });
+            }
+          await Cart.update({quantity:quantity},{where:{user:id,product:productId}})
+          res.status(200).json({status:true,message:"تم التعديل بنجاح"})
+
+        }
+        else
+        {
+          if(product.quilty<quantity)
+            {
+              return res.status(400).json({ status: false, message: "الكمية المطلوبة غير متوفرة" });
+            }
+          await Cart.create({user:id,product:productId,quantity:quantity})
+
+        }
+
+
+  })
+
+  cheekCartProduct=expressHandler(async(req,res,next)=>{
+
+      const id=req.user.id;
+      const product=req.params.id;
+      const cart=await Cart.findOne({where:{user:id,product:product}});
+      if(cart)
+        {
+          res.status(200).json({status:true,quantity:cart.quantity})
+        }
+        else
+        {
+          res.status(200).json({status:true,quantity:0})
+
+        }
+  })
 
   addOneToCart=expressHandler(async(req,res,next)=>{
 
@@ -142,14 +187,33 @@ class CartController
         if(oldCount==1)
           {
             await Cart.destroy({where:{user:id,product:productId}})
-            res.status(201).json({status:true,message:"تم الحذف بنجاح"})
+            res.status(200).json({status:true,message:"تم الحذف بنجاح"})
           }
           else
           {
             await Cart.update({quantity:oldCount-1},{where:{user:id,product:productId}})
-            res.status(201).json({status:true,message:"تم الحذف بنجاح"})
+            res.status(200).json({status:true,message:"تم الحذف بنجاح"})
           }
   })  
+
+  deleteProductFromCart=expressHandler(async(req,res,next)=>{
+      if(req.params.id)
+        {
+          const userID=req.user.id;
+    const product=req.params.id;
+    await Cart.destroy({where:{user:userID,product:product}});
+
+    res.status(200).json({status:true,message:"تم الحذف بنجاح"})
+
+        }
+        else
+        {
+          return res.status(400).json({ status: false, message: "يجب تحديد المنتج" });
+        }
+
+    
+
+  })
 
   getCartDelivery=expressHandler(async(req,res,next)=>{
 

@@ -54,10 +54,36 @@ cheekCartItemsQuantity=[
 
     validationMiddleware
 ]
+
+editCartValidation=[
+    check('quantity').notEmpty().withMessage('الكمية مطلوبة')
+    .isNumeric().withMessage('الكمية غير صحيحة'),
+
+    check('product').notEmpty().withMessage('المنتج مطلوب')
+    .isNumeric().withMessage('المنتج غير صحيح')
+    .custom(async (value,{req}) => {
+        const product= await Product.findOne({ where: { id: value } });
+        if (!product) {
+            return Promise.reject(new Error('المنتج غير موجود'));
+        }
+        
+    }),
+    validationMiddleware
+]
+
+cheekCartProductQuantity=[
+    check('id').notEmpty().withMessage('المنتج مطلوب')
+    .isNumeric().withMessage('المنتج غير صحيح'),
+
+
+    validationMiddleware
+
+]
 module.exports = {
     addCartValidation,
     deleteCartValidatio,
     cheekWalletValidation,
-    // cheekCartItemsQuantity
+    editCartValidation,
+    cheekCartProductQuantity
 
 }
