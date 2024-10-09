@@ -11,7 +11,8 @@ const globalError = require('./Middleware/ErrorMiddleware');
 const sendFailureResponse = require('./utils/ResponseHepler/SendFailureResponse');
 const { connectDB } = require('./Config/database');
 const mountRoutes = require('./Api/index');
-
+const { sequelize } = require('./Config/database');
+const { Product, OrderItem } = require('./Features/Products/releation');
 
 connectDB();
 // 
@@ -38,11 +39,21 @@ app.use(globalError);
 
 
 
+
+// Synchronize models with database
+// sequelize.sync({ force: false })
+//   .then(() => {
+//     console.log('Database synchronized');
+//   })
+//   .catch(err => {
+//     console.error('Failed to sync database:', err);
+//   });
 const host='192.168.10.164'
 
 // Run Server
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT,host, () => {
+    
 
     console.log(`server started ${PORT}`);
     console.log(`http://${host}:${PORT}`);

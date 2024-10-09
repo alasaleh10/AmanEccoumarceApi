@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../../Config/database');
 const ProductImage = require('./productImagesModel');
+const OrderItem = require('../orders/OrderItemsModel');
 const Product = sequelize.define('products', {
     id: {
         type: DataTypes.INTEGER,

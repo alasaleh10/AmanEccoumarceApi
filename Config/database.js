@@ -19,7 +19,7 @@ const sequelize = new Sequelize(process.env.BD_NAME,
 const connectDB=async function connectionDB() {
   
         await sequelize.authenticate();
-        // sequelize.sync({ force: false })
+        
 
       
         console.log('Connection has been established successfully.');

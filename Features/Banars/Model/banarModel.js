@@ -13,5 +13,8 @@ const Banar=sequelize.define('banars',{
         unique:true
     }
     
-})
+},
+{
+    timestamps:false}
+)
 module.exports = Banar

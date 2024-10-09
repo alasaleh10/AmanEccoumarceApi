@@ -101,7 +101,7 @@ class CartController
       const productId=req.body.product;
       const quantity = req.body.quantity ;
       const product=await Product.findOne({where:{id:productId}})
-      const oldCart=await Cart.findOne({where:{user:id,product:productId}});
+      const oldCart=await Cart.findOne({where:{user:id,product:productId,status:0}});
       if(oldCart)
         {
 
@@ -137,7 +137,7 @@ class CartController
 
       const id=req.user.id;
       const product=req.params.id;
-      const cart=await Cart.findOne({where:{user:id,product:product}});
+      const cart=await Cart.findOne({where:{user:id,product:product,status:0}});
       if(cart)
         {
           res.status(200).json({status:true,quantity:cart.quantity})

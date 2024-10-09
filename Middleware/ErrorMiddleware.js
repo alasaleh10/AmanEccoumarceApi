@@ -10,6 +10,7 @@ const globalError=(err,req,res,next)=>
             status: false,
             message: err.message || "An unexpected error occurred",
             statusCode: err.statusCode,
+            // stack: err.stack
         });
     }
     module.exports=globalError;
