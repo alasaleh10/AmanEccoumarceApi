@@ -1,15 +1,17 @@
 'use strict';
-const moment = require('moment-timezone');
+
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const now = moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss');
+    const now = new Date(); 
+    
     await queryInterface.bulkInsert('categories', [
       {
         name: 'أجهزة الكترونية',
         image: 'electronic.jpg',
         isActive: 1,
-        createdAt: now,
-        updatedAt: now
+        createdAt: now, 
+        updatedAt: now 
       },
       {
         name: 'عطورات',

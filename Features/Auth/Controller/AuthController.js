@@ -11,53 +11,54 @@ const generatedCode = require('../../../utils/generadt_code');
 const sendEmail = require('../../../helpers/sendEmail');
 const {welcomAgainMessage} = require('../../../helpers/emailMessages');
 const ApiError = require('../../../utils/ApiError');
-const myTime = require('../../../helpers/myTime');
 const resizedImage = require('../../../helpers/resizedImage');
 const add5MinTime=moment().tz('Asia/Aden').add(5, 'minutes').format('yyyy-MM-DD HH:mm:ss');
 class AuthController
 {
 
-  cheekToken=expressHandler(async(req,res,next)=>
-    {
-      let token;
-      if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
-        {
-          token=req.headers.authorization.split(' ')[1];
-        }
+   cheekToken = expressHandler(async (req, res, next) => {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
 
-      if(!token)
-        {
-          return next(new ApiError(401,'خطا في تسجيل الدخول, يرجى تسجيل الدخول مرة أخرى'));
-        }
+    if (!token) {
+        return next(new ApiError(401, 'خطا في تسجيل الدخول, يرجى تسجيل الدخول مرة أخرى'));
+    }
 
-      const decoded=jwt.verify(token,process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-      const user=await User.findOne({where:{id:decoded.id}});
-      if(!user)
-        {
-          return next(new ApiError(401,'لايوجد حساب لديك قم بتسجيل حساب'));
-        }
-        if (user.passwordUpdatedAt) {
-          const issuedAt = moment.unix(decoded.iat).format('YYYY-MM-DD HH:mm:ss');
+    const user = await User.findOne({ where: { id: decoded.id } });
+
+    if (!user) {
+        return next(new ApiError(401, 'لايوجد حساب لديك قم بتسجيل حساب'));
+    }
+
+    if (!user.isApproved) {
+        return next(new ApiError(401, 'تم توقيف حسابك'));
+    }
+
+    if (user.passwordUpdatedAt) {
+        const iat = moment.unix(decoded.iat).tz('Asia/Riyadh');
+        const passwordUpdatedAt = moment(user.passwordUpdatedAt).tz('Asia/Riyadh');
+    
         
-       
-          const issuedAtMoment = moment(issuedAt, 'YYYY-MM-DD HH:mm:ss');
-          const passwordUpdatedAtMoment = moment(user.passwordUpdatedAt, 'YYYY-MM-DD HH:mm:ss');
-        
-         
-          if (issuedAtMoment.isBefore(passwordUpdatedAtMoment)) {
+
+      
+        if (iat.isBefore(passwordUpdatedAt)&& !iat.isSame(passwordUpdatedAt)) {
             return next(new ApiError(401, 'انتهت صلاحية كلمة المرور الخاصة بك'));
-          }
         }
-        
+    }
 
-      req.user=user;
-      next();
-    });
+    req.user = user;
+    next();
+});
 
-    cheekisAdmin=expressHandler(async(req,res,next)=>{
 
-      if(!req.user.isAdmin==true)
+
+  cheekisAdmin=expressHandler(async(req,res,next)=>{
+
+      if(req.user.isAdmin==false)
         {
           return  res.status(401).json({success:false,message:"غير مسموح لك بالدخول"})
         }
@@ -65,7 +66,8 @@ class AuthController
 
 
     })
-    optinalToken=expressHandler(async(req,res,next)=>{
+  optinalToken=expressHandler(async(req,res,next)=>{
+     
       let token;
       if(req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
         {
@@ -79,22 +81,18 @@ class AuthController
         const decoded=jwt.verify(token,process.env.JWT_SECRET_KEY);
 
       const user=await User.findOne({where:{id:decoded.id}});
+     
       if(!user)
         {
           return next(new ApiError(401,'لايوجد حساب لديك قم بتسجيل حساب'));
         }
         if (user.passwordUpdatedAt) {
-          const issuedAt = moment.unix(decoded.iat).format('YYYY-MM-DD HH:mm:ss');
-        
-       
-          const issuedAtMoment = moment(issuedAt, 'YYYY-MM-DD HH:mm:ss');
-          const passwordUpdatedAtMoment = moment(user.passwordUpdatedAt, 'YYYY-MM-DD HH:mm:ss');
-        
-         
-          if (issuedAtMoment.isBefore(passwordUpdatedAtMoment)) {
-            return next(new ApiError(401, 'انتهت صلاحية كلمة المرور الخاصة بك'));
+          const iat = moment.unix(decoded.iat).tz('Asia/Riyadh');
+          const passwordUpdatedAt = moment(user.passwordUpdatedAt).tz('Asia/Riyadh');
+          if (iat.isBefore(passwordUpdatedAt)&& !iat.isSame(passwordUpdatedAt)) {
+              return next(new ApiError(401, 'انتهت صلاحية كلمة المرور الخاصة بك'));
           }
-        }
+      }
         
 
       req.user=user;
@@ -127,14 +125,17 @@ sendCode=expressHandler(async(req,res)=>
   
     
 
-    const user=await User.findOne({where:{email:email}});          
+    // const user=await User.findOne({where:{email:email}});          
     try {  
-     await sendEmail(
-            user.email,
-            welcomAgainMessage(code, user.firstName)
-           ,
-            "كود التحقق لحسابك في متجر أمان"
-        );
+
+      console.log(code);
+      
+    //  await sendEmail(
+    //         user.email,
+    //         welcomAgainMessage(code, user.firstName)
+    //        ,
+    //         "كود التحقق لحسابك في متجر أمان"
+    //     );
 
         await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
        return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح"});
@@ -149,12 +150,12 @@ sendCode=expressHandler(async(req,res)=>
 
 restPassword=expressHandler(async(req,res)=>{
     
-
+  const now = moment().tz('Asia/Aden').format();
     const {email,password}=req.body;
   
     const hashedPassword=await bcrypt.hash(password,10);
 
-    await User.update({password:hashedPassword,passwordUpdatedAt:myTime},{where:{email:email}});
+    await User.update({password:hashedPassword,passwordUpdatedAt:now},{where:{email:email}});
 
     return res.status(200).json({success:true,message:"تم تغيير كلمة المرور بنجاح"});
 

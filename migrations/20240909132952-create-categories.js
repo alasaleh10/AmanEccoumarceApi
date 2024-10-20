@@ -24,11 +24,11 @@ module.exports = {
         allowNull: false
       },
       createdAt: {
-        type: Sequelize.STRING(500),
+        type: Sequelize.DATE,
         allowNull: false
       },
       updatedAt: {
-        type: Sequelize.STRING(500), 
+        type: Sequelize.DATE, 
         allowNull: false
       }
     });

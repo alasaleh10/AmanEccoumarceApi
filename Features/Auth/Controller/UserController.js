@@ -6,10 +6,9 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const User=require('../Models/UserModel');
 const seandFailreResponse = require('../../../utils/ResponseHepler/SendFailureResponse');
-const date = require('../../../helpers/myTime');
 const Order = require('../../orders/OrderModel');
 
-const now = moment().tz('Asia/Aden');
+
 
 
 
@@ -35,106 +34,92 @@ class UserController
         }); 
     })
 
-    virifyCode=expressHandler(async(req,res)=>
-
-
-        {
-            
-           
-            
-            const {email,virifyCode}=req.body;
-
-            const hashedResetCode = crypto
-    .createHash('sha256')
-    .update(virifyCode)
-    .digest('hex');
-            const user=await User.findOne({where:{email:email}});
-           
-
-            
-            if(user.virifyCode===hashedResetCode)
-                {
-                    if(user.expireCodeDate>date)
-                        {
-                            let code = Math.floor(10000 + Math.random() * 90000).toString();
-                            const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
-
-                   const user2=    await User.update({virifyCode:hashedCode,isApproved:true,passwordUpdatedAt:date}
-
-                       ,{where:{email:email}});
-
-                       const userdate=new Date(user2.passwordUpdatedAt);
-                             const token=jwt.sign({id:user.id,
-
-                                iat:Math.floor(userdate.getTime() / 1000)
-                             }
-                                ,process.env.JWT_SECRET_KEY
-                            );
-                             if (user.image) {
-                                user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
-                            }
-                            user.password=undefined;
-                            user.virifyCode=undefined;
-                            user.expireCodeDate=undefined;
-
-                            return res.status(200).json({
-                                success:true,
-                                message:'تم التحقق بنجاح',
-                                user,
-                                token
-                            });
-                        }
-                        else
-                        {
-                            return seandFailreResponse(res,400,'انتهت صلاحية الكود')
-                        }
+     virifyCode = expressHandler(async (req, res) => {
+     
+       
+    
+        const { email, virifyCode } = req.body;
+    
+        const hashedResetCode = crypto
+            .createHash('sha256')
+            .update(virifyCode)
+            .digest('hex');
+    
+        const user = await User.findOne({ where: { email: email } });
+    
+        if (user.virifyCode === hashedResetCode) {
+          
+            if (moment(user.expireCodeDate).isAfter(moment().tz('Asia/Riyadh'))) {
+                let code = Math.floor(10000 + Math.random() * 90000).toString();
+                const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+    
+                await User.update(
+                    { virifyCode: hashedCode, isApproved: true, passwordUpdatedAt: moment().tz('Asia/Riyadh').format() },
+                    { where: { email: email } }
+                );    
+                const token = jwt.sign({ id: user.id, iat: moment().tz('Asia/Riyadh').unix() }, process.env.JWT_SECRET_KEY);
+                if (user.image) {
+                    user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
                 }
-                else
-                {
-                    return seandFailreResponse(res,400,'كود التحقق غير صحيح')
-                }
+                user.password = undefined;
+                user.virifyCode = undefined;
+                user.expireCodeDate = undefined;
+    
+                return res.status(200).json({
+                    success: true,
+                    message: 'تم التحقق بنجاح',
+                    user,
+                    token
+                });
+            } else {
+                return sendFailureResponse(res, 400, 'انتهت صلاحية الكود');
+            }
+        } else {
+            return sendFailureResponse(res, 400, 'كود التحقق غير صحيح');
         }
-
-
-    );
+    });
+    
 
      login=expressHandler(async(req,res)=>
     {
         const {phone,password}=req.body;
         const user=await User.findOne({where:{phone:phone}});
+        if(!user)
+            {
+                return seandFailreResponse(res, 400, 'المستخدم غير موجود');
+            }
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             return seandFailreResponse(res, 400, 'كلمة المرور غير صحيحة');
         }
-
+        user.password=undefined;
+        user.virifyCode=undefined;
+        user.expireCodeDate=undefined;
+        user.passwordUpdatedAt=undefined;
+        delete user.dataValues.createdAt;
+    delete user.dataValues.updatedAt;
         if(!user.isApproved)
             {
                 let code = Math.floor(10000 + Math.random() * 90000).toString();
+               
                 console.log(code);
                 
       const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
       await User.update({virifyCode:hashedCode,expireCodeDate:moment().tz('Asia/Aden').
-        add(5, 'minutes').format('yyyy-MM-DD HH:mm:ss')},{where:{phone:phone}});
-      user.password=undefined;
-      user.virifyCode=undefined;
-      user.expireCodeDate=undefined;
-      user.passwordUpdatedAt=undefined;
+        add(5, 'minutes').format()},{where:{phone:phone}});
+      
+      
                 return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح",user});
             }
             else
             {
-                const userdate=new Date(user.passwordUpdatedAt);
-                
+ 
                 if (user.image) {
                     user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
                 }
-                const token=jwt.sign({id:user.id,
-                    iat:Math.floor(userdate.getTime() / 1000)} ,process.env.JWT_SECRET_KEY );
-                user.password=undefined;
-                user.virifyCode=undefined;
-                user.expireCodeDate=undefined;
-                user.passwordUpdatedAt=undefined;
+                const token = jwt.sign({ id: user.id, iat: moment().tz('Asia/Riyadh').unix() }, process.env.JWT_SECRET_KEY);
+                
                 return res.status(200).json({
                     success:true,
                     message:'تم تسجيل الدخول بنجاح',
@@ -157,7 +142,7 @@ class UserController
             }
             user.password=undefined;
             user.virifyCode=undefined;
-            user.expireCodeDate=undefined;
+            // user.expireCodeDate=undefined;
             user.passwordUpdatedAt=undefined;
             const order=await Order.count({where:{user:user.id, status: {
                 [Op.notIn]: [4, 5, 6]  

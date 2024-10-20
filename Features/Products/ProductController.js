@@ -1,55 +1,13 @@
 const expressHandler = require('express-async-handler');
 const {Sequelize} = require('sequelize');
 const sendFailure = require('../../utils/ResponseHepler/SendFailureResponse');
-const resizedImageOneFromList = require('../../helpers/resizedImageOneFromList');
-const resizedImages = require('../../helpers/ResizedMulterImages');
 const Product = require('./ProductModel');
 const productsImages = require('./productImagesModel');
 const Favorite = require('../Favorite/FavoriteModel');
 
 class ProcuctController{
 
-    addProduct=expressHandler(async(req,res,next)=>{
-
-    const data = req.body;
-
-if (!req.files['image']) {
-  return res.status(400).json({ status: false, message: "يجب رفع الصورة الرئيسية" });
-}
-
-
-const mainImageFilename = await resizedImageOneFromList(req, 'products', 50, 1000, 1000);
-
-const product = await Product.create({ ...data, image: mainImageFilename });
-product.image=`${process.env.BASE_URL}/storage/products/${mainImageFilename}`
-
-
-let productImages = [];
-
-
-
-if (req.files.imag) {
-  const images = await resizedImages(req.files.imag, 'products');
-  
-  for (const img of images) {
-    const productImage = await productsImages.create({ productId: product.id, imag: img });
-    productImages.push({ id: productImage.id, imag: `${process.env.BASE_URL}/storage/products/${img}` });
-  }
-}
-
-
-res.status(201).json({
-  status: true,
-  message: "تم اضافة المنتج بنجاح",
-  product: {
-    ...product.dataValues,  
-    images: productImages 
-  }
-});
-
-
     
-  });
 
   getProductsByCategoriees=expressHandler(async(req,res)=>{
     const { id } = req.params;

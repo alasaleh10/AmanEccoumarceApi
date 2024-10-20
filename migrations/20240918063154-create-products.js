@@ -19,7 +19,7 @@ module.exports = {
         allowNull: false
       },
       description: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.TEXT,
         allowNull: false
       },
       price: {
@@ -61,11 +61,11 @@ module.exports = {
         
       },
       createdAt: {
-        type: Sequelize.STRING(500),
+        type: Sequelize.DATE,
         allowNull: false
       },
       updatedAt: {
-        type: Sequelize.STRING(500),
+        type: Sequelize.DATE,
         allowNull: false
       }
     })

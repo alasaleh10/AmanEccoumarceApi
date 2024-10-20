@@ -2,7 +2,7 @@
 const path = require('path');
 const morgan = require('morgan');
 const express = require('express');
-const app = express();
+
 const dotenv = require('dotenv');
 dotenv.config({ path: 'config.env' });
 
@@ -13,7 +13,7 @@ const { connectDB } = require('./Config/database');
 const mountRoutes = require('./Api/index');
 const { sequelize } = require('./Config/database');
 const { Product, OrderItem } = require('./Features/Products/releation');
-
+const app = express();
 connectDB();
 // 
 

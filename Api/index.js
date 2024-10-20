@@ -10,7 +10,9 @@ const CartApi = require('./CartApi');
 const CouponApi = require('./CouponApi');
 const OrderApi = require('./OrderApi');
 const RatingApi = require('./RatingApi');
-
+const Users = require('./AdminApi/users');
+const CategorieeAdminApi = require('./AdminApi/CategorieeApi');
+const ProductsAdminApi = require('./AdminApi/ProductsApi');
 const mountRoutes=(app)=>
     {
 app.use('/api/users', userApi);
@@ -25,6 +27,9 @@ app.use('/api/carts', CartApi);
 app.use('/api/coupons', CouponApi);
 app.use('/api/orders', OrderApi);
 app.use('/api/ratings', RatingApi);
+app.use('/api/admins', Users);
+app.use('/api/admins/Categoriees', CategorieeAdminApi);
+app.use('/api/admins/Products', ProductsAdminApi);
     }
 
 module.exports=mountRoutes;

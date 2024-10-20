@@ -20,7 +20,7 @@ const authController = new AuthController();
 const {uploadSingleImage} = require('../Middleware/UploadImageMiddelware');
 
 router.post('/signUp',
-   
+     upload.none(),
       signUpValidation,
       userController.signUp
 )  ;

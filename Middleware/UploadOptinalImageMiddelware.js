@@ -6,6 +6,8 @@ const multerOptions = (allowedExtensions = ['.jpg', '.jpeg', '.png']) => {
   const multerStorage = multer.memoryStorage();
 
   const multerFilter = function (req, file, cb) {
+
+    if(!file) return cb(null, false);
     
 
     if (file.mimetype.startsWith('image')) {
@@ -27,18 +29,11 @@ const multerOptions = (allowedExtensions = ['.jpg', '.jpeg', '.png']) => {
 };
 
 
-const checkFileExists = (req, res, next) => {
-  
-  
-  if (!req.file) {
-    return next(new ApiError(400, "يجب رفع صورة"));
-  }
-  next();
-};
 
-exports.uploadSingleImage = (fieldName) => [
+
+exports.uploadSingleImageOptinal = (fieldName) => [
   multerOptions().single(fieldName),
-  checkFileExists
+  
 ];
 
-exports.uploadMixOfImages = (arrayOfFields) => multerOptions().fields(arrayOfFields);
+// exports.uploadMixOfImages = (arrayOfFields) => multerOptions().fields(arrayOfFields);

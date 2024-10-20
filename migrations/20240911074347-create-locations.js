@@ -51,12 +51,12 @@ module.exports = {
         type: Sequelize.BOOLEAN,
       },
       createdAt: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.DATE,
         
       },
      
       updatedAt: {
-        type: Sequelize.STRING(255),
+        type: Sequelize.DATE,
        
       }
       

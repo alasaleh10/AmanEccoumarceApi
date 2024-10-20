@@ -26,22 +26,26 @@ const Cart=sequelize.define('cart',{
         allowNull:false,
         defaultValue:0
     },
-    createdAt: {
-        allowNull: false,
-        type: DataTypes.DATEONLY,
-        defaultValue: Sequelize.literal(`CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Aden'`),
-    },
-    updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATEONLY,
-        defaultValue: Sequelize.literal(`CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Aden'`),
-    }
+   
     
     
      
 },
-{timestamps:false,
-    tableName: 'cart'
+{timestamps:true,
+    tableName: 'cart',
+    hooks:{
+        beforeCreate: async (cart) =>{
+            const now = moment().tz('Asia/Riyadh').format();
+
+            cart.createdAt = now;
+            cart.updatedAt = now;
+
+        },
+        beforeUpdate : async (cart) =>{
+            const now = moment().tz('Asia/Riyadh').format();
+            cart.updatedAt = now;
+        }
+    }
 
 })
 Cart.belongsTo(Product, { foreignKey: 'product', as: 'products' });

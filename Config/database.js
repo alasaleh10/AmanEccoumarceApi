@@ -10,8 +10,11 @@ const sequelize = new Sequelize(process.env.BD_NAME,
     host: process.env.DB_HOST,
     dialect: 'oracle',
     dialectModule: oracledb,
+    
     dialectOptions: {
       connectString: process.env.DB_CONNECTIONSTRING,
+    
+      
     },
     logging: console.log,
   });
