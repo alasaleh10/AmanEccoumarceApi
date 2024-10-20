@@ -103,10 +103,10 @@ class HomeController
         return product.dataValues;
       }));
 
-      const getMonthlyProducts=await Product.findAll({where:{createdAt: 
-        { [Op.gt]: new Date(new Date().setMonth(new Date().getMonth() - 1)) }},limit: 8, order: Sequelize.literal('DBMS_RANDOM.VALUE') })
+      // const getMonthlyProducts=await Product.findAll({where:{createdAt: 
+      //   { [Op.gt]: new Date(new Date().setMonth(new Date().getMonth() - 1)) }},limit: 8, order: Sequelize.literal('DBMS_RANDOM.VALUE') })
       
-      return res.status(200).json({ status: true,locationName, banars, categorie, bestSellingProducts });
+      // return res.status(200).json({ status: true,locationName, banars, categorie, bestSellingProducts });
       
       
       
