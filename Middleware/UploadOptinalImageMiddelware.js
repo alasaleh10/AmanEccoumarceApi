@@ -7,6 +7,7 @@ const multerOptions = (allowedExtensions = ['.jpg', '.jpeg', '.png']) => {
 
   const multerFilter = function (req, file, cb) {
 
+
     if(!file) return cb(null, false);
     
 

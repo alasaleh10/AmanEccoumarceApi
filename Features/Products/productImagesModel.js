@@ -20,8 +20,30 @@ const ProductImage = sequelize.define('productImages', {
             key: 'id'
         }
     }
-}, { timestamps: false });
+}, { timestamps: false,
+//     hooks: {
+//         afterFind: (productImage) => {
+         
+            
+//             if(Array.isArray(productImage))
+//                 {
+//                     productImage.forEach((productImage) => {
+//                         productImage.dataValues.imag=`${process.env.BASE_URL}/storage/products/${productImage.imag}`
+                      
+//                     })
 
-
+//                 }
+//                 else if(productImage)
+//                     {
+//                         productImage.dataValues.imag=`${process.env.BASE_URL}/storage/products/${productImage.imag}`
+//                     }
+//  }
+//            }
+ }
+);
 
 module.exports = ProductImage;
+
+
+
+

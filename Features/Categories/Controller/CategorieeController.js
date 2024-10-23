@@ -5,44 +5,19 @@ const sendFailure = require('../../../utils/ResponseHepler/SendFailureResponse')
 class CategorieeController
 {
 
-
-    // getAllCatergoriees=expressHandler(async(req,res)=>
-    //     {
-    //         const categories = await Categoriee.findAll({where:{isActive:true}});
-
-    //         if(categories.length==0)    
-    //             {
-    //                 return sendFailure(res,400,'لايوجد أقسام');
-    //             }
-    //         res.status(200).json({status:true,categories});
-    //     })
     getAllCatergoriees = expressHandler(async (req, res) => {
-        const categories = await Categoriee.findAll({ where: { isActive: true } });
-      
+        const categories = await Categoriee.findAll({ where: { isActive: true } });  
         if (categories.length == 0) {
           return sendFailure(res, 400, 'لايوجد أقسام');
         }
-      
-       
-       
-      
-       
-        const updatedCategories = categories.map(category => {
-          return {
-            ...category.dataValues, 
-            image: `${process.env.BASE_URL}/storage/categories/${category.image}` 
-          };
+        categories.map((category) => {
+        delete  category.dataValues.createdAt;
+        delete  category.dataValues.updatedAt;
+        return category;  
         });
-      
-        res.status(200).json({ status: true, categories: updatedCategories });
+ 
+        res.status(200).json({ status: true, categories: categories });
       });
-      
-
-
-
-
-   
-
-
+  
 }
 module.exports=CategorieeController

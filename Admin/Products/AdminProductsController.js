@@ -1,8 +1,10 @@
+const fs = require('fs');
 const expressHandler = require('express-async-handler');
 const { Op } = require('sequelize');
 const Product = require('../../Features/Products/ProductModel');
 const resizedImageOneFromList = require('../../helpers/resizedImageOneFromList');
 const resizedImages = require('../../helpers/ResizedMulterImages');
+const resizedImage = require('../../helpers/resizedImage');
 const productsImages = require('../../Features/Products/productImagesModel');
 const Category = require('../../Features/Categories/Models/categorieModel');
 class AdminProductsController{
@@ -100,10 +102,50 @@ class AdminProductsController{
     
     return res.status(200).json({ status: true, products: formattedProducts });
     
-  }) 
+  })
+  
+  getOneProduct=expressHandler(async(req,res,next)=>{
+    if(!req.params.id) return res.status(400).json({status:false,message:'يجب عليك ادخال رقم المنتج'})
+    const id=req.params.id
+    const product = await Product.findOne({
+      where: { id },
+      include: [
+        {
+          model: productsImages,
+          as: 'images' }
+      ]
+    });
+    if(!product) return res.status(400).json({status:false,message:'هذا المنتج غير موجود'})
     
-}
+   product.dataValues.priceAfterDiscount = product.price - ((product.discount / 100) * product.price);
 
+      product.images=product.images.map(image=>{
+       
+        delete image.dataValues.productId;
+        image.dataValues.imag=`${process.env.BASE_URL}/storage/products/${image.imag}`
+        return image});
+    return res.status(200).json({status:true,product:product})
+  })
 
+  editProduct=expressHandler(async(req,res,next)=>{
+    if(!req.params.id) return res.status(400).json({status:false,message:'يجب عليك ادخال رقم المنتج'})
+    const id=req.params.id
+    const data = req.body;
+    const product = await Product.findOne({ where: { id } });
+    if(!product) return res.status(400).json({status:false,message:'هذا المنتج غير موجود'})
+
+      if(req.file)
+        {
+          const filename = await resizedImage(req, 'products',95,1000,1000);
+            const imageName = product.image.split('products/')[1];
+            fs.unlinkSync(`storage/products/${imageName}`);
+            data.image=filename
+
+        }
+  await  product.update(data);
+    return res.status(200).json({status:true,message:`تم تعديل المنتج ${product.name} بنجاح`})
+    })
+
+  }
 module.exports=AdminProductsController
 

@@ -92,9 +92,11 @@ const User = sequelize.define('users', {
             const now = moment().tz('Asia/Riyadh');
             user.updatedAt = now; 
         },
-//         afterFind: (user) => {
-// user.dataValues.createdAt=moment(user.createdAt).tz('Asia/Riyadh').format();
-//         }
+        afterFind: (user) => {
+
+       user.dataValues.createdAt=moment(user.createdAt).tz('Asia/Riyadh').format();
+       user.image=`${process.env.BASE_URL}/storage/users/${user.image}`
+        }
     }
 });
 

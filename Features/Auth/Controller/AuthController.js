@@ -12,7 +12,7 @@ const sendEmail = require('../../../helpers/sendEmail');
 const {welcomAgainMessage} = require('../../../helpers/emailMessages');
 const ApiError = require('../../../utils/ApiError');
 const resizedImage = require('../../../helpers/resizedImage');
-const add5MinTime=moment().tz('Asia/Aden').add(5, 'minutes').format('yyyy-MM-DD HH:mm:ss');
+const add5MinTime=moment().tz('Asia/Riyadh').add(5, 'minutes').format('');
 class AuthController
 {
 
@@ -150,7 +150,7 @@ sendCode=expressHandler(async(req,res)=>
 
 restPassword=expressHandler(async(req,res)=>{
     
-  const now = moment().tz('Asia/Aden').format();
+  const now = moment().tz('Asia/Riyadh').format()
     const {email,password}=req.body;
   
     const hashedPassword=await bcrypt.hash(password,10);

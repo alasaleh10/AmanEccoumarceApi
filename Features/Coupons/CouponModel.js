@@ -1,3 +1,4 @@
+const moment = require('moment-timezone');
 const { DataTypes } = require('sequelize');
 
 const { sequelize } = require('../../Config/database');  
@@ -32,7 +33,27 @@ const Coupon=sequelize.define('coupons',{
     }
 }
 ,{
-    timestamps:false
+    timestamps:false,
+    hooks:{
+       afterFind: (coupon) => {
+
+        if(Array.isArray(coupon))
+            {
+                coupon.forEach((c) => {
+                    c.dataValues.expire=moment(c.expire).tz('Asia/Riyadh').format();
+                });
+
+            }
+            else if(coupon)
+                {
+                    coupon.dataValues.expire=moment(coupon.expire).tz('Asia/Riyadh').format();
+
+                }
+
+
+          
+       }
+    }
 }
 )
 module.exports = Coupon  

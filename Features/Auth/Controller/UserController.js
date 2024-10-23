@@ -58,9 +58,7 @@ class UserController
                     { where: { email: email } }
                 );    
                 const token = jwt.sign({ id: user.id, iat: moment().tz('Asia/Riyadh').unix() }, process.env.JWT_SECRET_KEY);
-                if (user.image) {
-                    user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
-                }
+               
                 user.password = undefined;
                 user.virifyCode = undefined;
                 user.expireCodeDate = undefined;
@@ -72,10 +70,10 @@ class UserController
                     token
                 });
             } else {
-                return sendFailureResponse(res, 400, 'انتهت صلاحية الكود');
+                return seandFailreResponse(res, 400, 'انتهت صلاحية الكود');
             }
         } else {
-            return sendFailureResponse(res, 400, 'كود التحقق غير صحيح');
+            return seandFailreResponse(res, 400, 'كود التحقق غير صحيح');
         }
     });
     
@@ -98,7 +96,7 @@ class UserController
         user.expireCodeDate=undefined;
         user.passwordUpdatedAt=undefined;
         delete user.dataValues.createdAt;
-    delete user.dataValues.updatedAt;
+        delete user.dataValues.updatedAt;
         if(!user.isApproved)
             {
                 let code = Math.floor(10000 + Math.random() * 90000).toString();
@@ -115,9 +113,7 @@ class UserController
             else
             {
  
-                if (user.image) {
-                    user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
-                }
+               
                 const token = jwt.sign({ id: user.id, iat: moment().tz('Asia/Riyadh').unix() }, process.env.JWT_SECRET_KEY);
                 
                 return res.status(200).json({
@@ -137,12 +133,10 @@ class UserController
     getAccount=expressHandler(async(req,res)=>
         {
             const user=req.user;
-            if (user.image) {
-                user.image = `${process.env.BASE_URL}/storage/users/${user.image}`;
-            }
+          
             user.password=undefined;
             user.virifyCode=undefined;
-            // user.expireCodeDate=undefined;
+            user.expireCodeDate=undefined;
             user.passwordUpdatedAt=undefined;
             const order=await Order.count({where:{user:user.id, status: {
                 [Op.notIn]: [4, 5, 6]  

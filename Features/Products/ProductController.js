@@ -32,7 +32,7 @@ class ProcuctController{
     
     const productss = products.map(product => {
   
-        product.dataValues.image = `${process.env.BASE_URL}/storage/products/${product.dataValues.image}`;
+       
         
 
         product.dataValues.priceAfterDiscount = product.price - ((product.discount / 100) * product.price);
@@ -72,10 +72,6 @@ class ProcuctController{
   }
   
   const productss = products.map(product => {
-
-      product.dataValues.image = `${process.env.BASE_URL}/storage/products/${product.dataValues.image}`;
-      
-
       product.dataValues.priceAfterDiscount = product.price - ((product.discount / 100) * product.price);
   
       product.dataValues.isFavorite = userId ? favoriteProductIds.includes(product.id) : false;
@@ -92,11 +88,12 @@ class ProcuctController{
   res.status(200).json({ status: true, products: productss });
   });
 
-   getSpicificProduct = async (req, res) => {
+   getSpicificProduct = expressHandler( async (req, res) => {
    
     
       const { id } = req.params;
       const userId = req.user ? req.user.id : null;
+   
      
       const product = await Product.findOne({
         where: { id },
@@ -112,18 +109,15 @@ class ProcuctController{
       product.dataValues.isFavorite = userId
       ? !!(await Favorite.findOne({ where: { user: userId, product: id } }))
       : false;
-  product.image=`${process.env.BASE_URL}/storage/products/${product.image}`;
+
 
   product.images=product.images.map(image=>{
     delete image.dataValues.productId;
     delete image.dataValues.id;
 
-    image.imag=`${process.env.BASE_URL}/storage/products/${image.imag}`;
+    image.dataValues.imag=`${process.env.BASE_URL}/storage/products/${image.imag}`
     return image});
 
-
-  
-  
     const similarProducts = await Product.findAll({
       where: {
         categoriee: product.categoriee,
@@ -159,7 +153,7 @@ class ProcuctController{
       similarProducts: updatedSimilarProducts
     });
    
-  };
+  });
   
 
 

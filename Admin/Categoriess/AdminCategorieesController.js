@@ -4,7 +4,6 @@ const expressHandler = require('express-async-handler');
 const { Op,Sequelize } = require('sequelize');
 const Categoriee = require('../../Features/Categories/Models/categorieModel');
 const resizedImage = require('../../helpers/resizedImage');
-const { log } = require('console');
 class AdminCategorieeController
 {
     getAllCategories = expressHandler(async (req, res, next) => {
