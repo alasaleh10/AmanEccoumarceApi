@@ -106,13 +106,30 @@ class AuthController
 
 forgetPassword=expressHandler(async(req,res)=>{
     const code=generatedCode();
-    console.log(code);
-    
-    const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+    const user=await User.findOne({where:{email:req.body.email}});
+
+    if(!user)
+      {
+        return res.status(400).json({success:false,message:"البريد الألكتروني غير موجود"});
+      }
+      try {
+        await sendEmail(
+            user.email,
+            welcomAgainMessage(code, user.firstName)
+           ,
+            "كود التحقق لحسابك في متجر أمان"
+        );
+        const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
     const {email}=req.body;
- await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
+   await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
 
    return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح"});
+      } catch (error) {
+      
+        res.status(400).json({success:false,message:"فشل ارسال البريد الألكتروني"});
+      }
+    
+    
 
 });
 
@@ -125,22 +142,26 @@ sendCode=expressHandler(async(req,res)=>
   
     
 
-    // const user=await User.findOne({where:{email:email}});          
+    const user=await User.findOne({where:{email:email}});
+    if(!user)
+      {
+        return res.status(400).json({success:false,message:"البريد الألكتروني غير موجود"});
+      }          
     try {  
 
-      console.log(code);
+    
       
-    //  await sendEmail(
-    //         user.email,
-    //         welcomAgainMessage(code, user.firstName)
-    //        ,
-    //         "كود التحقق لحسابك في متجر أمان"
-    //     );
+     await sendEmail(
+            user.email,
+            welcomAgainMessage(code, user.firstName)
+           ,
+            "كود التحقق لحسابك في متجر أمان"
+        );
 
         await User.update({virifyCode:hashedCode,expireCodeDate:add5MinTime},{where:{email:email}});
-       return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح"});
+       return res.status(200).json({status:true,message:"تم ارسال كود التحقق بنجاح"});
       } catch (error) {
-        throw new ApiError(400,'فشل إرسال البريد الإلكتروني');
+        res.status(400).json({success:false,message:"فشل ارسال البريد الألكتروني"});
         
      
     }
@@ -174,15 +195,16 @@ restPassword=expressHandler(async(req,res)=>{
 })
 editAccountImage=expressHandler(async(req,res)=>{
 
-    const id=req.user.id;
-    const user=await User.findOne({where:{id:id}});
+    
+  const user=req.user;
   const filename=await resizedImage(req,'users');
-    if(user.image!='defualtUserImage.jpeg') 
+  const imageName = user.image.split('users/')[1];
+    if(imageName!='defualtUserImage.jpeg') 
       {
        fs.unlinkSync(`storage/users/${user.image}`);
 
       }
-    await User.update({image:filename},{where:{id:id}});
+    await User.update({image:filename},{where:{id:user.id}});
     return res.status(200).json({status:true,message:"تم تعديل الصورة الشخصية بنجاح"});
 
       

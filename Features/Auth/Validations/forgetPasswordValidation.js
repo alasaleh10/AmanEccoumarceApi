@@ -5,27 +5,13 @@ const User = require('../Models/UserModel');
 forgetPasswordValidation=[
     check('email').notEmpty().withMessage('البريد الألكتروني مطلوب')
     .isEmail().
-    withMessage('البريد الألكتروني غير صحيح').
-    custom(async (value) => {
-        const user=await User.findOne({where:{email:value}});
-        if(!user){
-           
-            return Promise.reject(new Error('البريد الألكتروني غير موجود '));
-        }       
-    }),
+    withMessage('البريد الألكتروني غير صحيح'),
     validationMiddleware
 ];
 sendCodeValidation=[
     check('email').notEmpty().withMessage('البريد الألكتروني مطلوب')
     .isEmail().
-    withMessage('البريد الألكتروني غير صحيح').
-    custom(async (value) => {
-        const user=await User.findOne({where:{email:value}});
-        if(!user){
-           
-            return Promise.reject(new Error('البريد الألكتروني غير موجود '));
-        }       
-    }),
+    withMessage('البريد الألكتروني غير صحيح'),
     validationMiddleware
 ];
 restPasswordValidation=[

@@ -90,7 +90,7 @@ class AdminProductsController{
             attributes: ['name']
         }]
     });
-    // console.log(`length is ${products.length}`);
+
     
     if(products.length==0) return res.status(400).json({status:false,message:'لايوجد منتجات'})
 

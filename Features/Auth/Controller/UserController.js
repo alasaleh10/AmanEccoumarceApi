@@ -7,21 +7,17 @@ const crypto = require('crypto');
 const User=require('../Models/UserModel');
 const seandFailreResponse = require('../../../utils/ResponseHepler/SendFailureResponse');
 const Order = require('../../orders/OrderModel');
-
-
-
-
-
+const sendEmail = require('../../../helpers/sendEmail');
+const {welcomAgainMessage} = require('../../../helpers/emailMessages');
 class UserController
 {
 
-
-    signUp=expressHandler(async(req,res)=>
+ signUp=expressHandler(async(req,res)=>
     {
         
         
-       const {firstName,lastName,email,phone,password}=req.body;
-        const user = await User.create({firstName,lastName,email,phone,password});
+     const {firstName,lastName,email,phone,password}=req.body;
+     const user = await User.create({firstName,lastName,email,phone,password});
      const data={
         id:user.id,
         email:user.email
@@ -46,6 +42,10 @@ class UserController
             .digest('hex');
     
         const user = await User.findOne({ where: { email: email } });
+
+        if(!user){
+            return res.status(404).json({success:false,message:'المستخدم غير موجود '})
+        }
     
         if (user.virifyCode === hashedResetCode) {
           
@@ -101,14 +101,28 @@ class UserController
             {
                 let code = Math.floor(10000 + Math.random() * 90000).toString();
                
-                console.log(code);
+          
+
+                try{
+                    await sendEmail(
+                        user.email,
+                        welcomAgainMessage(code, user.firstName)
+                       ,
+                        "كود التحقق لحسابك في متجر أمان"
+                    );
+                    const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+                    await User.update({virifyCode:hashedCode,expireCodeDate:moment().tz('Asia/Aden').
+                      add(5, 'minutes').format()},{where:{phone:phone}});
+                    
+                    
+                              return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح",user});
+                }
+                catch(err)
+                {
+                  return seandFailreResponse(res, 400, 'حدث خطأ في ارسال البريد الالكتروني');
+                }
                 
-      const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
-      await User.update({virifyCode:hashedCode,expireCodeDate:moment().tz('Asia/Aden').
-        add(5, 'minutes').format()},{where:{phone:phone}});
-      
-      
-                return res.status(200).json({success:true,message:"تم ارسال كود التحقق بنجاح",user});
+     
             }
             else
             {

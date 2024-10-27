@@ -24,7 +24,7 @@ class HomeController
             
            const productss=products.map(product => {
 
-                product.dataValues.image = `${process.env.BASE_URL}/storage/products/${product.dataValues.image}`;
+          
       product.dataValues.priceAfterDiscount = product.price - ((product.discount / 100) * product.price);
 
                 delete product.dataValues.createdAt;
@@ -58,11 +58,7 @@ class HomeController
         limit: 5,
         order: Sequelize.literal('DBMS_RANDOM.VALUE') 
       });
-      banars.map(banar => {
-        banar.dataValues.image = `${process.env.BASE_URL}/storage/banars/${banar.dataValues.image}`;
-        delete banar.dataValues.id;
-        return banar.dataValues;
-      })
+  
       const categorie=await Categoriees.findAll({ where: { isActive: true }, 
          limit: 6, order: Sequelize.literal('DBMS_RANDOM.VALUE')})
       categorie.map(categoriee => {
@@ -70,7 +66,6 @@ class HomeController
         delete categoriee.dataValues.updatedAt;
         delete categoriee.dataValues.isActive;
         
-        categoriee.dataValues.image = `${process.env.BASE_URL}/storage/categories/${categoriee.dataValues.image}`;
        
         return categoriee.dataValues;
       })
@@ -98,7 +93,7 @@ class HomeController
           ? !!(await Favorite.findOne({ where: { user: userId, product: product.id } }))
           : false;
         product.dataValues.priceAfterDiscount = product.price - ((product.discount / 100) * product.price);
-        product.dataValues.image = `${process.env.BASE_URL}/storage/products/${product.dataValues.image}`;
+        // product.dataValues.image = `${process.env.BASE_URL}/storage/products/${product.dataValues.image}`;/
         
         return product.dataValues;
       }));

@@ -56,27 +56,20 @@ const Order=sequelize.define('orders',{
     recivedDate:{
         type:DataTypes.DATE,
         allowNull:true
-    },
-    createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE
-    },
-    updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE
     }
+
 },
 {
     timestamps: true,
     beforeCreate: async (order) => 
         {
-            order.createdAt = moment().tz('Asia/Aden').format();
-            order.updatedAt = moment().tz('Asia/Aden').format();
+            order.createdAt = moment().tz('Asia/Riyadh').format();;
+            order.updatedAt = moment().tz('Asia/Riyadh').format();;
             
         },
         befupdate: async (order) => 
         {
-            order.updatedAt = moment().tz('Asia/Aden').format();
+            order.updatedAt = moment().tz('Asia/Riyadh').format();;
             
         }
     

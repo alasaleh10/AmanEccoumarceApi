@@ -64,11 +64,6 @@ router.put('/editMyAccount',
      authController.editMyAccount
      );
 router.put('/editImage',
-// (req,res,next)=>{
-//      console.log(req);
-//      next();
-     
-// },
      authController.cheekToken,
      uploadSingleImage('image'),
      authController.editAccountImage

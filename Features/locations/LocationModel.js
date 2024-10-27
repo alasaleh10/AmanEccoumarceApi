@@ -39,21 +39,25 @@ const Location = sequelize.define('locations', {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    createdAt: {
-        type: DataTypes.STRING,
-        defaultValue: moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss')
-    },
-    updatedAt: {
-        type: DataTypes.STRING,
-        defaultValue: moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss')
-    }
+    
 },{
-    timestamps: false,
+    timestamps: true,
    
-    beforeUpdate: (location) => {
-        const now = moment().tz('Asia/Aden').format('yyyy-MM-DD HH:mm:ss');
-        location.updatedAt = now;
-    }
+  hooks:{
+    beforeCreate: async (location) => {
+        location.createdAt = moment().tz("Asia/Kabul").format();
+    },
+    beforeUpdate: async (location) => {
+        location.updatedAt = moment().tz("Asia/Kabul").format();
+    },
+
+    // afterFind: async(location)=>{
+
+
+
+
+    // }
+  }
 })
 
 module.exports = Location

@@ -69,9 +69,54 @@ cheekCouponValidation=
   
     validationMiddleware
 ]
+editCouponValidation=[
+
+    check('count').optional({nullable:true}).isNumeric().withMessage('العدد غير صحيح').custom((value) => {
+        if(value<=0)
+            {
+                return Promise.reject(new Error('العدد يجب ان يكون اكبر من صفر'));
+            }
+            return true;
+    }),
+
+    check('discount').optional({nullable:true}) .isNumeric().withMessage('النسبة غير صحيحة').custom((value) => {
+
+        if(value<0)
+            {
+                return Promise.reject(new Error('نسبة الخصم يجب ان تكون اكبر من صفر'));
+            }
+
+        if(value>100)
+            {
+                return Promise.reject(new Error('نسبة الخصم يجب ان تكون اقل أو تساوي 100'));
+            }
+            return true;
+    }),
+    check('isActive').optional({nullable:true}).isBoolean().withMessage('الحالة غير صحيحة'),
+    check('expire').optional({nullable:true}).custom((value) => {
+
+        if (!moment(value, ['YYYY-MM-DD', 'YYYY-M-D', 'YYYY/MM/DD', 'YYYY/M/D', 'YYYY-MM-DDTHH:mm:ss.SSS'], true).isValid()) {
+
+            return Promise.reject(new Error('تاريخ الانتهاء غير صحيح'));
+        }
+
+        const expireDate = moment(value, ['YYYY-MM-DD', 'YYYY-M-D', 'YYYY/MM/DD', 'YYYY/M/D', 'YYYY-MM-DDTHH:mm:ss.SSS'], true); 
+        const today = moment.tz('Asia/Aden').startOf('day');
+
+        if (expireDate.isBefore(today)) {
+
+            return Promise.reject(new Error('تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ اليوم'));
+        }
+
+        return true;
+    }),
+
+    validationMiddleware
+];
 
 module.exports={
     addCouponValidation,
-    cheekCouponValidation
+    cheekCouponValidation,
+    editCouponValidation
 
 }

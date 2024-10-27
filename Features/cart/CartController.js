@@ -67,11 +67,19 @@ class CartController
   
 
     addToCart=expressHandler(async(req,res,next)=>{
+      const oldProduct=await Product.findOne({where:{id:req.body.product}});
+      if(!oldProduct)
+        {
+          return res.status(400).json({ status: false, message: "المنتج غير موجود" });
+        }
+
+
+
             const id=req.user.id;
             const product=req.body.product;
            const quantity = req.body.quantity ?? 1;
-           const oldCart=await Cart.findOne({where:{user:id,product:product}});
-           const oldProduct=await Product.findOne({where:{id:product}})
+           const oldCart=await Cart.findOne({where:{user:id,product:product,status:0}});
+           
 
 
       if(oldCart)
@@ -80,7 +88,7 @@ class CartController
           {
             return res.status(400).json({ status: false, message: "الكمية المطلوبة غير متوفرة" });
           }
-          await Cart.update({quantity:oldCart.quantity+quantity},{where:{user:id,product:product}})
+          await Cart.update({quantity:oldCart.quantity+quantity},{where:{user:id,product:product,status:0}})
           res.status(201).json({status:true,message:"تم الاضافة بنجاح"})
         }
         else
@@ -97,17 +105,23 @@ class CartController
 
     editCart=expressHandler(async(req,res,next)=>{
 
+      const product=await Product.findOne({where:{id:req.body.product}});
+      if(!product)
+        {
+          return res.status(400).json({ status: false, message: "المنتج غير موجود" });
+        }
+
       const id=req.user.id;
       const productId=req.body.product;
       const quantity = req.body.quantity ;
-      const product=await Product.findOne({where:{id:productId}})
+     
       const oldCart=await Cart.findOne({where:{user:id,product:productId,status:0}});
       if(oldCart)
         {
 
           if(quantity==0)
             {
-              await Cart.destroy({where:{user:id,product:productId}})
+              await Cart.destroy({where:{user:id,product:productId,status:0}})
               return  res.status(200).json({status:true,message:"تم الحذف بنجاح"})
             }
 
@@ -116,8 +130,8 @@ class CartController
             {
               return res.status(400).json({ status: false, message: "الكمية المطلوبة غير متوفرة" });
             }
-          await Cart.update({quantity:quantity},{where:{user:id,product:productId}})
-          res.status(200).json({status:true,message:"تم التعديل بنجاح"})
+          await Cart.update({quantity:quantity},{where:{user:id,product:productId,status:0}})
+          return  res.status(200).json({status:true,message:"تم التعديل بنجاح"})
 
         }
         else
@@ -127,6 +141,7 @@ class CartController
               return res.status(400).json({ status: false, message: "الكمية المطلوبة غير متوفرة" });
             }
           await Cart.create({user:id,product:productId,quantity:quantity})
+          return  res.status(201).json({status:true,message:"تم الاضافة بنجاح"})
 
         }
 
@@ -150,19 +165,24 @@ class CartController
   })
 
   addOneToCart=expressHandler(async(req,res,next)=>{
+    const product=await Product.findOne({where:{id:req.body.product}});
+    if(!product)
+      {
+        return res.status(400).json({ status: false, message: "المنتج غير موجود" });
+      }
 
         const id=req.user.id;
         const productId=req.body.product;
-        const product=await Product.findOne({where:{id:productId}})
-        const oldCart = await Cart.findOne({where:{user:id,product:productId}});
+        
+        const oldCart = await Cart.findOne({where:{user:id,product:productId,status:0}});
         if(oldCart)
           {
             if(oldCart.quantity+1 >product.quilty)
             {
               return res.status(400).json({ status: false, message: "الكمية المطلوبة غير متوفرة" });
             }
-            await Cart.update({quantity:oldCart.quantity+1},{where:{user:id,product:productId}})
-            res.status(201).json({status:true,message:"تم الاضافة بنجاح"})
+            await Cart.update({quantity:oldCart.quantity+1},{where:{user:id,product:productId,status:0}}) 
+            return     res.status(201).json({status:true,message:"تم الاضافة بنجاح"})
 
           }
           else
@@ -173,25 +193,30 @@ class CartController
               }
             
             await Cart.create({user:id,product:productId,quantity:1})
-            res.status(201).json({status:true,message:"تم الاضافة بنجاح"})
+          return  res.status(201).json({status:true,message:"تم الاضافة بنجاح"})
           }
     })
 
-
+// Delete One From Cart
   deleteFromCart=expressHandler(async(req,res,next)=>{
+    const id=req.user.id;
+    const oldCart=await Cart.findOne({where:{user:id,product:req.body.product,status:0}});
+    if(!oldCart){
+      return res.status(400).json({ status: false, message: "المنتج غير موجود" });
+    }
 
-        const id=req.user.id;
+       
         const productId=req.body.product;
-        const oldCart=await Cart.findOne({where:{user:id,product:productId}});
+       
         const oldCount=oldCart.quantity;
         if(oldCount==1)
           {
-            await Cart.destroy({where:{user:id,product:productId}})
+            await Cart.destroy({where:{user:id,product:productId,status:0}})
             res.status(200).json({status:true,message:"تم الحذف بنجاح"})
           }
           else
           {
-            await Cart.update({quantity:oldCount-1},{where:{user:id,product:productId}})
+            await Cart.update({quantity:oldCount-1},{where:{user:id,product:productId,  status:0}})
             res.status(200).json({status:true,message:"تم الحذف بنجاح"})
           }
   })  
@@ -201,7 +226,7 @@ class CartController
         {
           const userID=req.user.id;
     const product=req.params.id;
-    await Cart.destroy({where:{user:userID,product:product}});
+    await Cart.destroy({where:{user:userID,product:product,status:0}});
 
     res.status(200).json({status:true,message:"تم الحذف بنجاح"})
 
@@ -222,7 +247,7 @@ class CartController
 
     if(!location)
       {
-res.status(400).json({status:false,message:"يجب تحديد الموقع الرئيسي"})
+     res.status(400).json({status:false,message:"يجب تحديد الموقع الرئيسي"})
       }
       else{
         const delivery=calculateDistance(location.lat,location.lng);

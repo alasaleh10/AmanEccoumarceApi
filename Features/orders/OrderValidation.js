@@ -2,7 +2,7 @@ const { check ,body} = require('express-validator');
 const validationMiddleware = require('../../Middleware/validatiorMiddelware');
 const Coupone = require('../Coupons/CouponModel');
 const Location = require('../locations/LocationModel');
-const Order = require('./OrderModel');
+
 addOrderValidation=[
 
     check('coupon').optional({nullable:true})
@@ -39,14 +39,7 @@ addOrderValidation=[
 
 orderDetilsValidation=[
     check('id').notEmpty().withMessage('يجب تحديد الطلب').
-    isInt({ min: 1 }).withMessage('يجب أن يحتوي الطلب على معرف صحيح')
-    .custom(async (value) => {
-
-        const order = await Order.findOne({ where: { id: value } });
-        if (!order) {
-            return Promise.reject(new Error('الطلب غير موجود'));
-        }
-    }),
+    isInt({ min: 1 }).withMessage('يجب أن يحتوي الطلب على معرف صحيح'),
     validationMiddleware
 
 ]

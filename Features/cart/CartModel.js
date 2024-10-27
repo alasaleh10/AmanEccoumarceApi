@@ -1,4 +1,5 @@
-const { DataTypes ,Sequelize } = require('sequelize');
+const moment = require('moment-timezone');
+const { DataTypes  } = require('sequelize');
 const { sequelize } = require('../../Config/database');
 const Product = require('../Products/ProductModel');
 const Cart=sequelize.define('cart',{

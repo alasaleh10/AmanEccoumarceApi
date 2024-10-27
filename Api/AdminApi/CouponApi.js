@@ -4,7 +4,10 @@ const AdminCouponsController = require('../../Admin/Coupons/AdminCouponControlle
 const adminCouponsController = new AdminCouponsController();
 const AuthController = require('../../Features/Auth/Controller/AuthController');
 const authController = new AuthController();
-const {addCouponValidation} = require('../../Features/Coupons/CouponValidation');
+const {addCouponValidation,
+    editCouponValidation
+
+} = require('../../Features/Coupons/CouponValidation');
 
 
 router.post('/add',
@@ -23,6 +26,20 @@ router.get('/:id?',
     authController.cheekToken,
     authController.cheekisAdmin,
     adminCouponsController.getCouponDetils
+)
+router.post('/serachCoupons',
+    authController.cheekToken,
+    authController.cheekisAdmin,
+    adminCouponsController.serachCoupons
+
+)
+
+router.put('/:id?',
+    authController.cheekToken,
+    authController.cheekisAdmin,
+    editCouponValidation,
+    adminCouponsController.editCoupone
+
 )
 // router.delete('/:id?',
 //     authController.cheekToken,

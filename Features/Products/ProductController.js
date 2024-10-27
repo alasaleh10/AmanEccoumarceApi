@@ -115,7 +115,7 @@ class ProcuctController{
     delete image.dataValues.productId;
     delete image.dataValues.id;
 
-    image.dataValues.imag=`${process.env.BASE_URL}/storage/products/${image.imag}`
+
     return image});
 
     const similarProducts = await Product.findAll({
@@ -129,7 +129,6 @@ class ProcuctController{
 
     const updatedSimilarProducts = await Promise.all(
       similarProducts.map(async similarProduct => {
-        similarProduct.dataValues.image = `${process.env.BASE_URL}/storage/products/${similarProduct.dataValues.image}`;
         similarProduct.dataValues.priceAfterDiscount = similarProduct.price - ((similarProduct.discount / 100) * similarProduct.price);
         delete similarProduct.dataValues.createdAt;
         delete similarProduct.dataValues.updatedAt;

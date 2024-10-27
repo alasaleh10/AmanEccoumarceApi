@@ -15,14 +15,14 @@ module.exports = {
       },
       {
         name: 'عطورات',
-        image: 'Perfumes.jpg',
+        image: 'Perfumes.png',
         isActive: 1,
         createdAt: now,
         updatedAt: now
       },
       {
         name: 'سوني',
-        image: 'playstation.jpg',
+        image: 'playstation.png',
         isActive: 1,
         createdAt: now,
         updatedAt: now

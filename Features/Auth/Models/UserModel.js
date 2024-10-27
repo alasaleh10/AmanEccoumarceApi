@@ -70,13 +70,13 @@ const User = sequelize.define('users', {
             let code = Math.floor(10000 + Math.random() * 90000).toString();
           
             try {
-                console.log(code);
+               
                 
-                // await sendEmail(
-                //     user.email,
-                //     welcomAmanMessage(code, user.firstName),
-                //     "كود التحقق لحسابك في متجر أمان"
-                // );
+                await sendEmail(
+                    user.email,
+                    welcomAmanMessage(code, user.firstName),
+                    "كود التحقق لحسابك في متجر أمان"
+                );
             } catch (error) {
                 throw new ApiErorr(400, 'فشل إرسال البريد الإلكتروني');
             }
@@ -93,9 +93,14 @@ const User = sequelize.define('users', {
             user.updatedAt = now; 
         },
         afterFind: (user) => {
-
-       user.dataValues.createdAt=moment(user.createdAt).tz('Asia/Riyadh').format();
+            if(user)
+                {
+                       user.dataValues.createdAt=moment(user.createdAt).tz('Asia/Riyadh').format();
        user.image=`${process.env.BASE_URL}/storage/users/${user.image}`
+
+                }
+
+    
         }
     }
 });

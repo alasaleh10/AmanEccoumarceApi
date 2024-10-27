@@ -1,6 +1,5 @@
 const { check } = require('express-validator');
 const validationMiddleware = require('../../../Middleware/validatiorMiddelware');
-const User = require('../Models/UserModel');
 loginValidation = [
     check('phone').notEmpty().withMessage('رقم الهاتف مطلوب').isNumeric()
     .withMessage('رقم الهاتف غير صحيح'),
