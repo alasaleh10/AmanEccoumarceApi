@@ -11,9 +11,6 @@ let code=  generatedCode();
     .toFormat('png')
     .png({ quality: quality })
     .toFile(`storage/${storageFile}/${filename}`);
-   
-    
-
   return filename;
 };
 module.exports = resizeImage;

@@ -38,7 +38,7 @@ addOrderValidation=[
 ];
 
 orderDetilsValidation=[
-    check('id').notEmpty().withMessage('يجب تحديد الطلب').
+    check('id').notEmpty().withMessage("قم بادخال رقم الطلب").
     isInt({ min: 1 }).withMessage('يجب أن يحتوي الطلب على معرف صحيح'),
     validationMiddleware
 

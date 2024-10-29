@@ -64,7 +64,7 @@ class OrderController
             }
           }));
           
-           await Cart.update({status:1},{where:{user:userId}})
+           await Cart.update({status:1},{where:{user:userId,status:0}});
 
 
         return res.status(201).json({
@@ -72,7 +72,7 @@ class OrderController
             message: "تم اضافة الطلب بنجاح",
             order: {
               id: order.id,              
-              createdAt: moment(order.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
+              createdAt: moment(order.createdAt).tz('Asia/Riyadh').format()
             }
           });
       
@@ -123,7 +123,7 @@ if(order.coupon)
 
   delete order.dataValues.user;
   delete order.dataValues.updatedAt;
-  order.dataValues.createdAt=moment(order.dataValues.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss');
+  order.dataValues.createdAt=moment(order.dataValues.createdAt).tz('Asia/Riyadh').format();
 
   if(order.location)
     {
@@ -183,7 +183,7 @@ if(order.coupon)
       delete order.dataValues.coupon;
       delete order.dataValues.totalCart;
       delete order.dataValues.deliveryPrice;
-      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
+      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Aden').format()
 
       
 
@@ -221,7 +221,7 @@ if(order.coupon)
       delete order.dataValues.coupon;
       delete order.dataValues.totalCart;
       delete order.dataValues.deliveryPrice;
-      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss')
+      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Riyadh').format('YYYY-MM-DD HH:mm:ss');
 
       
 
@@ -231,6 +231,36 @@ if(order.coupon)
     })
     res.status(200).json({ status: true, orders: orders });
   })
+
+  serchOrder=expressHandler(async(req,res,next)=>{
+    const { id } = req.params;
+    const user=req.user.id;
+
+    const order = await Order.findOne({
+      where: {
+          user: user, id: id},
+    }
+    )
+
+    if(!order)
+      {
+        return res.status(400).json({status:false,message:"لا يوجد طلب لك بهذا الرقم"});
+      }
+
+      delete order.dataValues.user;
+      delete order.dataValues.updatedAt;
+      delete order.dataValues.location;
+      delete order.dataValues.coupon;
+      delete order.dataValues.totalCart;
+      delete order.dataValues.deliveryPrice;
+      order.dataValues.createdAt=moment(order.createdAt).tz('Asia/Aden').format('YYYY-MM-DD HH:mm:ss');
+
+    res.status(200).json({ status: true, order: order });
+
+
+  })
+
+
 }
 module.exports=OrderController
 

@@ -4,10 +4,17 @@ const sendFailure = require('../../utils/ResponseHepler/SendFailureResponse');
 class LocationController
 {
     addLocation=expressHandler(async(req,res)=>{
+        var isMain=true;
+
+        const locations=await Location.findAll({where:{user:req.user.id}});
+        if(locations.length>0)
+        {
+            isMain=false;
+        }
         
         const data=req.body;
        
-     await Location.create({...data,user:req.user.id});
+     await Location.create({...data,user:req.user.id,isMain:isMain});
 
         res.status(201).json({status:true,message:"تم اضافة الموقع بنجاح"});
 
@@ -20,7 +27,7 @@ class LocationController
             where: {
               user: req.user.id
             },
-            order: [['isMain', 'DESC'], ['id', 'ASC']] // ترتيب حسب isMain ثم id
+            order: [['isMain', 'DESC'], ['id', 'ASC']] 
           });
           
        
@@ -58,12 +65,15 @@ class LocationController
     changeMainLocation=expressHandler(async(req,res)=>{
 
         const id=req.params.id;
-        const oldLocation=await Location.findOne({where:{id:id,user:req.user.id}});
-        if(oldLocation)
+        const location=await Location.findOne({where:{id:id,user:req.user.id}});
+        if(!location)
             {
-            await Location.update({isMain:false},{where:{user:req.user.id}});
+                return sendFailure(res,400,'لايوجد موقع');
+            
             }
 
+           
+          await Location.update({isMain:false},{where:{user:req.user.id}});
           await Location.update({isMain:true},{where:{id:id,user:req.user.id}});
           res.status(200).json({status:true,message:"تم تغيير الموقع للرئيسي بنجاح"});  
            

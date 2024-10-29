@@ -29,6 +29,15 @@ router.get('/orderDetails/:id?',
     orderDetilsValidation,
     orderController.getMyOrderDetils
 )
+router.get('/:id?',
+    orderDetilsValidation,
+    authController.cheekToken,
+    orderController.serchOrder
+
+
+)
+
+
 
 
 
