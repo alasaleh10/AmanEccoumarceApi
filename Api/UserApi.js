@@ -70,4 +70,9 @@ router.put('/editImage',
 
 
 );
+
+router.get('/getSpisificUserDate',
+     authController.cheekToken
+     ,userController.getSpisificUserDate
+)
 module.exports = router;

@@ -161,6 +161,23 @@ class UserController
                 order
             })
         })
+     
+    getSpisificUserDate=expressHandler(async(req,res)=>{
+        const user=req.user;
+
+        const userDate={
+            firstName:user.firstName,
+            lastName:user.lastName,
+            email:user.email,
+            image:user.image
+
+        }
+        return res.status(200).json({
+            status:true,
+            user: userDate
+           
+        })
+ }   ) 
 
 
         

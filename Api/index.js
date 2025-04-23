@@ -16,8 +16,9 @@ const CategorieeAdminApi = require('./AdminApi/CategorieeApi');
 const ProductsAdminApi = require('./AdminApi/ProductsApi');
 const CouponAdminApi = require('./AdminApi/CouponApi');
 const NotificationAdminApi = require('./AdminApi/NotificationApi');
+const OrdersAdminApi = require('./AdminApi/OrderApi');
 const mountRoutes=(app)=>
-    {
+{
 app.use('/api/users', userApi);
 app.use('/api/banars', bannarApi);
 app.use('/api/locations', locationApi);
@@ -35,7 +36,9 @@ app.use('/api/admins', Users);
 app.use('/api/admins/Categoriees', CategorieeAdminApi);
 app.use('/api/admins/Products', ProductsAdminApi);
 app.use('/api/admins/Coupons', CouponAdminApi);
-app.use('/api/admins/Notifications',NotificationAdminApi)
-    }
+app.use('/api/admins/Notifications',NotificationAdminApi);
+app.use('/api/admins/Orders',OrdersAdminApi);
+
+}
 
 module.exports=mountRoutes;

@@ -56,8 +56,11 @@ const Order=sequelize.define('orders',{
     recivedDate:{
         type:DataTypes.DATE,
         allowNull:true
+    },
+    isFastDelivery:{
+        type:DataTypes.BOOLEAN,
+        allowNull:true
     }
-
 },
 {
     timestamps: true,
